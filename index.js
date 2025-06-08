@@ -12,6 +12,9 @@ app.use(express.json());
 const authRoutes = require('./src/api/routes/authRoutes');
 app.use('/api/auth', authRoutes); // All routes in authRoutes will be prefixed with /api/auth
 
+const userRoutes = require('./src/api/routes/userRoutes');
+app.use('/api/users', userRoutes); 
+
 // Use the PORT from environment variables, or 3000 if it's not defined
 const PORT = process.env.PORT || 3000;
 

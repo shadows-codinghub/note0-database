@@ -28,3 +28,12 @@ Content-Type: application/json
   "email": "test@example.com",
   "password": "wrongpassword"
 }
+
+### Test protected route WITHOUT a token
+GET http://localhost:3000/api/users/me
+
+
+### Test protected route WITH a token
+# Replace "PASTE_YOUR_TOKEN_HERE" with the actual token you copied
+GET http://localhost:3000/api/users/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNDRkYzgxNmUtODgyNS00NjkyLTk3NjUtM2M5ZTg4MWVjOWRlIiwicm9sZSI6InJlZ2lzdGVyZWQifSwiaWF0IjoxNzQ5Mzk1MDEzLCJleHAiOjE3NDk5OTk4MTN9.yCLjfn1cYQeulbrBZ7hIFxboJ59NkRvKXs2SQo3PgT8
