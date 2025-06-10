@@ -3,8 +3,8 @@ POST http://localhost:3000/api/auth/register
 Content-Type: application/json
 
 {
-  "fullName": "Test User",
-  "email": "test@example.com",
+  "fullName": "Test User 2",
+  "email": "regular@example.com",
   "password": "password123",
   "collegeName": "KTU Main Campus",
   "branch": "Computer Science",
@@ -37,3 +37,63 @@ GET http://localhost:3000/api/users/me
 # Replace "PASTE_YOUR_TOKEN_HERE" with the actual token you copied
 GET http://localhost:3000/api/users/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNDRkYzgxNmUtODgyNS00NjkyLTk3NjUtM2M5ZTg4MWVjOWRlIiwicm9sZSI6InJlZ2lzdGVyZWQifSwiaWF0IjoxNzQ5Mzk1MDEzLCJleHAiOjE3NDk5OTk4MTN9.yCLjfn1cYQeulbrBZ7hIFxboJ59NkRvKXs2SQo3PgT8
+
+###
+### UPLOAD A NEW NOTE
+# NOTE: This format is for multipart/form-data. VS Code's REST Client handles it.
+# Replace "PASTE_YOUR_TOKEN_HERE" with your actual JWT.
+POST http://localhost:3000/api/materials/upload
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNDRkYzgxNmUtODgyNS00NjkyLTk3NjUtM2M5ZTg4MWVjOWRlIiwicm9sZSI6InJlZ2lzdGVyZWQifSwiaWF0IjoxNzQ5NDc0MzA0LCJleHAiOjE3NTAwNzkxMDR9.k1J1sZcuQaJdj53qXy-W5F32FX-tcrx1h74VnLkTK20
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="title"
+
+My First DSA Note
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="description"
+
+This is a sample note about linked lists.
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="subjectId"
+
+1
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="moduleNumber"
+
+2
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="noteFile"; filename="dsa_notes.pdf"
+Content-Type: application/pdf
+
+< C:\Users\abhij\Downloads\sample.pdf
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+### GET ALL MATERIALS
+GET http://localhost:3000/api/materials
+
+###
+### RATE A MATERIAL
+# Replace "PASTE_MATERIAL_ID_HERE" with the ID you copied from the database.
+# Replace "PASTE_YOUR_TOKEN_HERE" with your actual JWT.
+POST http://localhost:3000/api/materials/ca5e023b-527f-4c5f-ba7d-8d8a2952b8a3/rate
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNDRkYzgxNmUtODgyNS00NjkyLTk3NjUtM2M5ZTg4MWVjOWRlIiwicm9sZSI6InJlZ2lzdGVyZWQifSwiaWF0IjoxNzQ5NTc4NjIyLCJleHAiOjE3NTAxODM0MjJ9.dwEYBL_vw6-JAe_CSYPpMZlfVPoi0ntN9kIurEXXQwM
+Content-Type: application/json
+
+{
+  "score": 4
+}
+
+###
+### ADMIN: GET ALL USERS
+# Replace "PASTE_YOUR_ADMIN_TOKEN_HERE" with your admin JWT.
+GET http://localhost:3000/api/admin/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNDRkYzgxNmUtODgyNS00NjkyLTk3NjUtM2M5ZTg4MWVjOWRlIiwicm9sZSI6ImFkbWluIn0sImlhdCI6MTc0OTU4MDAwOSwiZXhwIjoxNzUwMTg0ODA5fQ.EFuBpdLH-90imX6ns7gI8Jj_XuLTV3WT7LYCz2dfXEE
+
+###
+### ADMIN: VERIFY A USER
+# Replace token and also replace "PASTE_REGULAR_USER_ID_HERE" with the ID you copied.
+PUT http://localhost:3000/api/admin/users/ab674609-7abd-499e-9c9f-28fcc351b130/verify
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNDRkYzgxNmUtODgyNS00NjkyLTk3NjUtM2M5ZTg4MWVjOWRlIiwicm9sZSI6ImFkbWluIn0sImlhdCI6MTc0OTU4MDAwOSwiZXhwIjoxNzUwMTg0ODA5fQ.EFuBpdLH-90imX6ns7gI8Jj_XuLTV3WT7LYCz2dfXEE

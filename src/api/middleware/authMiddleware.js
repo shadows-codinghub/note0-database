@@ -29,4 +29,14 @@ const protect = (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+const isAdmin = (req, res, next) => {
+  // This middleware should run AFTER the 'protect' middleware,
+  // so req.user will be available.
+  if (req.user && req.user.role === 'admin') {
+    next(); // User is an admin, proceed to the next function
+  } else {
+    res.status(403).json({ message: 'Forbidden. Admin access required.' });
+  }
+};
+
+module.exports = { protect, isAdmin };

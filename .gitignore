@@ -4,4 +4,5 @@
 # Environment variables
 .env
 
+/uploads
 test.http

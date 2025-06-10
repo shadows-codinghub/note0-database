@@ -15,6 +15,12 @@ app.use('/api/auth', authRoutes); // All routes in authRoutes will be prefixed w
 const userRoutes = require('./src/api/routes/userRoutes');
 app.use('/api/users', userRoutes); 
 
+const materialRoutes = require('./src/api/routes/materialRoutes'); 
+app.use('/api/materials', materialRoutes);
+
+const adminRoutes = require('./src/api/routes/adminRoutes'); 
+app.use('/api/admin', adminRoutes);
+
 // Use the PORT from environment variables, or 3000 if it's not defined
 const PORT = process.env.PORT || 3000;
 
