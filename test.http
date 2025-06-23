@@ -97,3 +97,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiN
 # Replace token and also replace "PASTE_REGULAR_USER_ID_HERE" with the ID you copied.
 PUT http://localhost:3000/api/admin/users/ab674609-7abd-499e-9c9f-28fcc351b130/verify
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNDRkYzgxNmUtODgyNS00NjkyLTk3NjUtM2M5ZTg4MWVjOWRlIiwicm9sZSI6ImFkbWluIn0sImlhdCI6MTc0OTU4MDAwOSwiZXhwIjoxNzUwMTg0ODA5fQ.EFuBpdLH-90imX6ns7gI8Jj_XuLTV3WT7LYCz2dfXEE
+
+###
+### ADMIN: Manually trigger the KTU notification scraper
+# Make sure to replace the token below with a fresh one from your ADMIN login
+POST http://localhost:3000/api/admin/scrape-notifications
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNDRkYzgxNmUtODgyNS00NjkyLTk3NjUtM2M5ZTg4MWVjOWRlIiwicm9sZSI6ImFkbWluIn0sImlhdCI6MTc0OTU4MDAwOSwiZXhwIjoxNzUwMTg0ODA5fQ.EFuBpdLH-90imX6ns7gI8Jj_XuLTV3WT7LYCz2dfXEE
