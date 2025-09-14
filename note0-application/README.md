@@ -35,7 +35,40 @@ git clone <repository-url>
 cd note0-application
 ```
 
-### 2. Database Setup
+### 2. Environment Setup
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit the `.env` file and set your database password and other configurations:
+   ```env
+   DB_PASSWORD=your_password_here
+   JWT_SECRET=your_jwt_secret_here
+   ```
+
+### 3. Database Setup
+
+#### Automated Setup (Recommended)
+
+**For Windows:**
+```powershell
+# Run the database setup script
+.\setup-db.ps1
+```
+
+**For Linux/macOS:**
+```bash
+# Make the script executable
+chmod +x setup-db.sh
+
+# Run the database setup script
+./setup-db.sh
+```
+
+#### Manual Setup
+If you prefer to set up the database manually:
 ```bash
 # Create PostgreSQL database
 sudo -u postgres psql
@@ -57,6 +90,25 @@ spring:
 ```
 
 ### 4. Build and Run
+
+#### Using Scripts (Recommended)
+
+**For Linux/macOS:**
+```bash
+# Make the script executable
+chmod +x run.sh
+
+# Run the application
+./run.sh
+```
+
+**For Windows:**
+```powershell
+# Run the application using PowerShell
+.\run.ps1
+```
+
+#### Manual Method
 ```bash
 # Build the application
 mvn clean install
@@ -108,8 +160,23 @@ The application supports the following file types:
 ## Development
 
 ### Running in Development Mode
+
+**Linux/macOS:**
 ```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
+export SPRING_PROFILES_ACTIVE=dev
+mvn spring-boot:run
+```
+
+**Windows (PowerShell):**
+```powershell
+$env:SPRING_PROFILES_ACTIVE = "dev"
+mvn spring-boot:run
+```
+
+**Windows (Command Prompt):**
+```cmd
+set SPRING_PROFILES_ACTIVE=dev
+mvn spring-boot:run
 ```
 
 ### Database Schema Updates

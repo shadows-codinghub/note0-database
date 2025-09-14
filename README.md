@@ -7,9 +7,47 @@ A comprehensive Java Spring Boot application for sharing academic materials, not
 The application has been completely converted from Node.js to Java Spring Boot. All old files have been removed and the new application is ready to use.
 
 ### Prerequisites
-- Java 17+
-- Maven 3.6+
-- PostgreSQL 12+
+- Java 17+ (Download from: https://adoptium.net)
+- Maven 3.6+ (Download from: https://maven.apache.org/download.cgi)
+- MySQL 8.0+ (Download from: https://dev.mysql.com/downloads/installer/)
+
+### Windows Setup Guide
+
+1. **Install Prerequisites**:
+   - Install Java: Run the installer and follow the prompts
+   - Install Maven: 
+     - Extract the downloaded archive to `C:\Program Files\Maven`
+     - Add `C:\Program Files\Maven\bin` to your System PATH
+   - Install PostgreSQL:
+     - Run the installer and note down your password
+     - Keep the default port (5432)
+     - Launch pgAdmin 4 to verify installation
+
+2. **Running the Application**:
+
+   **For Windows:**
+   ```powershell
+   # Open PowerShell as Administrator
+   cd note0
+   
+   # Run the Windows script
+   .\run-app.ps1
+   ```
+
+   If you get a security error, run:
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+   .\run-app.ps1
+   ```
+
+   **For Linux/macOS:**
+   ```bash
+   # Make the script executable
+   chmod +x run-app.sh
+   
+   # Run the script
+   ./run-app.sh
+   ```
 
 ### Installation & Setup
 
@@ -30,13 +68,32 @@ The application has been completely converted from Node.js to Java Spring Boot. 
    ```
 
 3. **Run the application:**
+
+   **For Windows (PowerShell):**
+   ```powershell
+   .\run.ps1
+   ```
+
+   **For Linux/macOS:**
    ```bash
+   chmod +x run.sh  # Make script executable (first time only)
    ./run.sh
+   ```
+
+   **Manual method (any platform):**
+   ```bash
+   # Build the application
+   mvn clean install
+   
+   # Run the application
+   mvn spring-boot:run
    ```
 
 4. **Access the application:**
    - Web Interface: http://localhost:8080
    - API Base: http://localhost:8080/api
+   
+   The application typically takes a few seconds to start. Wait for the message "Started Note0Application" in the console.
 
 ## 📁 Project Structure
 
