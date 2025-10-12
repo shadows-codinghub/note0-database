@@ -6,155 +6,167 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- * The admin panel for managing subjects.
- * Provides a full CRUD (Create, Read, Update, Delete) interface.
- */
 public class AdminPanel extends JPanel {
 
     private final SubjectDAO subjectDAO;
-    private final DashboardPanel dashboardPanel; // A reference to the dashboard to refresh it
+    private final MaterialDAO materialDAO;
 
     private JTable subjectTable;
-    private DefaultTableModel tableModel;
+    private DefaultTableModel subjectTableModel;
+    private JTable materialTable;
+    private DefaultTableModel materialTableModel;
 
-    // Form components
-    private JTextField nameField = new JTextField(20);
-    private JTextField branchField = new JTextField(20);
-    private JSpinner semesterSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 8, 1));
-    private JButton addButton = new JButton("Add Subject");
-    private JButton updateButton = new JButton("Update Selected");
-    private JButton deleteButton = new JButton("Delete Selected");
-    private JButton clearButton = new JButton("Clear Form");
-
-    public AdminPanel(DashboardPanel dashboardPanel, SubjectDAO subjectDAO) {
-        this.dashboardPanel = dashboardPanel;
+    public AdminPanel(SubjectDAO subjectDAO, MaterialDAO materialDAO) {
         this.subjectDAO = subjectDAO;
+        this.materialDAO = materialDAO;
 
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new GridLayout(2, 1, 10, 10)); // Two main sections: Subjects and Materials
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // --- CENTER: Table of Subjects ---
-        tableModel = new DefaultTableModel(new String[]{"ID", "Name", "Branch", "Semester"}, 0);
-        subjectTable = new JTable(tableModel);
-        add(new JScrollPane(subjectTable), BorderLayout.CENTER);
+        // --- Subjects Panel ---
+        JPanel subjectsPanel = new JPanel(new BorderLayout(10, 10));
+        subjectsPanel.setBorder(BorderFactory.createTitledBorder("Manage Subjects"));
 
-        // --- BOTTOM: Form for Adding/Editing ---
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBorder(BorderFactory.createTitledBorder("Subject Details"));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        gbc.gridx = 0; gbc.gridy = 0; formPanel.add(new JLabel("Name:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 0; gbc.gridwidth = 3; formPanel.add(nameField, gbc);
-
-        gbc.gridwidth = 1; // Reset gridwidth
-        gbc.gridx = 0; gbc.gridy = 1; formPanel.add(new JLabel("Branch:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 1; formPanel.add(branchField, gbc);
-
-        gbc.gridx = 2; gbc.gridy = 1; formPanel.add(new JLabel("Semester:"), gbc);
-        gbc.gridx = 3; gbc.gridy = 1; formPanel.add(semesterSpinner, gbc);
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.add(addButton);
-        buttonPanel.add(updateButton);
-        buttonPanel.add(deleteButton);
-        buttonPanel.add(clearButton);
+        subjectTableModel = new DefaultTableModel(new String[]{"ID", "Name", "Branch", "Semester"}, 0);
+        subjectTable = new JTable(subjectTableModel);
+        subjectsPanel.add(new JScrollPane(subjectTable), BorderLayout.CENTER);
         
-        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 4; formPanel.add(buttonPanel, gbc);
+        JButton deleteSubjectButton = new JButton("Delete Selected Subject");
+        subjectsPanel.add(deleteSubjectButton, BorderLayout.SOUTH);
 
-        add(formPanel, BorderLayout.SOUTH);
+        deleteSubjectButton.addActionListener(e -> deleteSubject());
 
-        // --- Attach Event Listeners ---
-        subjectTable.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) populateFormFromSelectedRow();
-        });
+        // --- Materials Panel ---
+        JPanel materialsPanel = new JPanel(new BorderLayout(10, 10));
+        materialsPanel.setBorder(BorderFactory.createTitledBorder("Review Pending Materials"));
+
+        materialTableModel = new DefaultTableModel(new String[]{"ID", "Title", "Uploader", "Subject", "Status"}, 0);
+        materialTable = new JTable(materialTableModel);
+        materialsPanel.add(new JScrollPane(materialTable), BorderLayout.CENTER);
+
+        JPanel materialButtonPanel = new JPanel(new FlowLayout());
+        JButton approveButton = new JButton("Approve Selected");
+        JButton rejectButton = new JButton("Reject Selected");
+        JButton deleteMaterialButton = new JButton("Delete Selected");
+        JButton refreshButton = new JButton("Refresh");
         
-        addButton.addActionListener(e -> addSubject());
-        updateButton.addActionListener(e -> updateSubject());
-        deleteButton.addActionListener(e -> deleteSubject());
-        clearButton.addActionListener(e -> clearForm());
+        materialButtonPanel.add(approveButton);
+        materialButtonPanel.add(rejectButton);
+        materialButtonPanel.add(deleteMaterialButton);
+        materialButtonPanel.add(refreshButton);
+        materialsPanel.add(materialButtonPanel, BorderLayout.SOUTH);
 
-        // --- Load Initial Data ---
+        approveButton.addActionListener(e -> approveMaterial());
+        rejectButton.addActionListener(e -> rejectMaterial());
+        deleteMaterialButton.addActionListener(e -> deleteMaterial());
+        refreshButton.addActionListener(e -> loadPendingMaterials());
+        
+        // Add both main panels to the AdminPanel
+        add(subjectsPanel);
+        add(materialsPanel);
+
         loadSubjects();
+        loadPendingMaterials();
     }
 
     private void loadSubjects() {
-        tableModel.setRowCount(0); // Clear table
+        subjectTableModel.setRowCount(0);
         try {
             List<Subject> subjects = subjectDAO.getAllSubjects();
             for (Subject subject : subjects) {
-                tableModel.addRow(new Object[]{subject.getId(), subject.getName(), subject.getBranch(), subject.getSemester()});
+                subjectTableModel.addRow(new Object[]{subject.getId(), subject.getName(), subject.getBranch(), subject.getSemester()});
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error loading subjects: " + e.getMessage(), "DB Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void clearForm() {
-        subjectTable.clearSelection();
-        nameField.setText("");
-        branchField.setText("");
-        semesterSpinner.setValue(1);
-    }
-
-    private void populateFormFromSelectedRow() {
-        int selectedRow = subjectTable.getSelectedRow();
-        if (selectedRow >= 0) {
-            nameField.setText(tableModel.getValueAt(selectedRow, 1).toString());
-            branchField.setText(tableModel.getValueAt(selectedRow, 2).toString());
-            semesterSpinner.setValue(tableModel.getValueAt(selectedRow, 3));
+    private void loadPendingMaterials() {
+        materialTableModel.setRowCount(0);
+        try {
+            List<Material> materials = materialDAO.getPendingMaterials();
+            for (Material material : materials) {
+                materialTableModel.addRow(new Object[]{material.getId(), material.getTitle(), material.getUploaderName(), material.getSubjectName(), material.getApprovalStatus()});
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error loading pending materials: " + e.getMessage(), "DB Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void addSubject() {
-        try {
-            subjectDAO.addSubject(nameField.getText(), branchField.getText(), (int) semesterSpinner.getValue());
-            JOptionPane.showMessageDialog(this, "Subject added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            loadSubjects(); // Refresh this panel's table
-            dashboardPanel.refreshData(); // CORRECTED LINE: Refresh the main dashboard
-            clearForm();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error adding subject: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    private void updateSubject() {
-        int selectedRow = subjectTable.getSelectedRow();
-        if (selectedRow < 0) {
-            JOptionPane.showMessageDialog(this, "Please select a subject to update.", "Info", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        Long id = (Long) tableModel.getValueAt(selectedRow, 0);
-        try {
-            subjectDAO.updateSubject(id, nameField.getText(), branchField.getText(), (int) semesterSpinner.getValue());
-            JOptionPane.showMessageDialog(this, "Subject updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-            loadSubjects();
-            dashboardPanel.refreshData(); // CORRECTED LINE: Refresh the main dashboard
-            clearForm();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error updating subject: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
     private void deleteSubject() {
         int selectedRow = subjectTable.getSelectedRow();
         if (selectedRow < 0) {
             JOptionPane.showMessageDialog(this, "Please select a subject to delete.", "Info", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        Long id = (Long) tableModel.getValueAt(selectedRow, 0);
+        Long id = (Long) subjectTableModel.getValueAt(selectedRow, 0);
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this subject?", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             try {
                 subjectDAO.deleteSubject(id);
                 JOptionPane.showMessageDialog(this, "Subject deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                loadSubjects();
-                dashboardPanel.refreshData(); // CORRECTED LINE: Refresh the main dashboard
-                clearForm();
+                loadSubjects(); // Refresh the list
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error deleting subject: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void deleteMaterial() {
+        int selectedRow = materialTable.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a material to delete.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        Long id = (Long) materialTableModel.getValueAt(selectedRow, 0);
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this material?", "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                materialDAO.deleteMaterial(id);
+                JOptionPane.showMessageDialog(this, "Material deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadPendingMaterials(); // Refresh the list
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error deleting material: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void approveMaterial() {
+        int selectedRow = materialTable.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a material to approve.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        Long id = (Long) materialTableModel.getValueAt(selectedRow, 0);
+        String title = (String) materialTableModel.getValueAt(selectedRow, 1);
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to approve '" + title + "'?", "Confirm Approval", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                materialDAO.updateApprovalStatus(id, "APPROVED");
+                JOptionPane.showMessageDialog(this, "Material approved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadPendingMaterials(); // Refresh the list
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error approving material: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void rejectMaterial() {
+        int selectedRow = materialTable.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Please select a material to reject.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        Long id = (Long) materialTableModel.getValueAt(selectedRow, 0);
+        String title = (String) materialTableModel.getValueAt(selectedRow, 1);
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to reject '" + title + "'?", "Confirm Rejection", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                materialDAO.updateApprovalStatus(id, "REJECTED");
+                JOptionPane.showMessageDialog(this, "Material rejected successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadPendingMaterials(); // Refresh the list
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error rejecting material: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

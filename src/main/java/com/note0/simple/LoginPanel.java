@@ -4,91 +4,91 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 
-/**
- * The panel for handling user login.
- * This class is responsible for the login UI and logic. Upon successful login,
- * it calls a method on the MainFrame to switch to the dashboard view.
- */
 public class LoginPanel extends JPanel {
 
-    // A reference to the main application frame to control navigation
     private final MainFrame mainFrame;
     private final UserDAO userDAO;
 
-    // UI Components
     private JTextField emailField = new JTextField(20);
     private JPasswordField passwordField = new JPasswordField(20);
     private JButton loginButton = new JButton("Login");
-    private JButton registerNavButton = new JButton("Create New Account");
+    private JButton registerButton = new JButton("Go to Register");
 
     public LoginPanel(MainFrame mainFrame, UserDAO userDAO) {
         this.mainFrame = mainFrame;
         this.userDAO = userDAO;
 
-        // Use a more flexible layout manager for better component arrangement
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // Padding between components
+        gbc.insets = new Insets(10, 10, 10, 10);
 
-        // --- UI Layout ---
+        // Title
+        JLabel titleLabel = new JLabel("Note0 Login");
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        add(titleLabel, gbc);
+
+        // Email
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         add(new JLabel("Email:"), gbc);
 
+        gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx = 1;
-        gbc.gridy = 0;
+        gbc.gridy = 1;
         add(emailField, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        add(new JLabel("Password:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        add(passwordField, gbc);
-        
-        // Panel to hold the buttons side-by-side
-        JPanel buttonPanel = new JPanel(new FlowLayout());
-        buttonPanel.add(loginButton);
-        buttonPanel.add(registerNavButton);
-
+        // Password
+        gbc.anchor = GridBagConstraints.EAST;
         gbc.gridx = 0;
         gbc.gridy = 2;
-        gbc.gridwidth = 2; // Make this component span two columns
+        add(new JLabel("Password:"), gbc);
+
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        add(passwordField, gbc);
+
+        // Buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.add(loginButton);
+        buttonPanel.add(registerButton);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         add(buttonPanel, gbc);
 
-        // --- Action Listeners ---
+        // Add Action Listeners
         loginButton.addActionListener(e -> handleLogin());
-        registerNavButton.addActionListener(e -> mainFrame.showRegistrationPanel());
+        registerButton.addActionListener(e -> mainFrame.showRegistrationPanel());
     }
 
-    /**
-     * Handles the login button click event.
-     */
     private void handleLogin() {
         String email = emailField.getText();
         String password = new String(passwordField.getPassword());
 
-        if (email.isBlank() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter both email and password.", "Input Error", JOptionPane.WARNING_MESSAGE);
+        if (email.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Email and password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         try {
-            User loggedInUser = userDAO.loginUser(email, password);
-
-            if (loggedInUser != null) {
-                // Login successful!
-                // Tell the MainFrame to create and show the dashboard for this user.
-                mainFrame.showDashboardPanel(loggedInUser);
+            User user = userDAO.loginUser(email, password);
+            if (user != null) {
+                mainFrame.showFeedPanel(user);
             } else {
-                // Login failed
                 JOptionPane.showMessageDialog(this, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "A database error occurred. Please try again later.", "Database Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace(); // Also print the full error to the console for debugging
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Database error during login: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
 }

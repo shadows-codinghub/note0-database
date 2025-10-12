@@ -4,17 +4,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
 
-/**
- * The panel for handling new user registration.
- * It provides a form for new users and, upon successful registration,
- * navigates back to the login panel via the MainFrame.
- */
 public class RegistrationPanel extends JPanel {
 
     private final MainFrame mainFrame;
     private final UserDAO userDAO;
 
-    // UI Components
     private JTextField fullNameField = new JTextField(20);
     private JTextField emailField = new JTextField(20);
     private JPasswordField passwordField = new JPasswordField(20);
@@ -27,9 +21,8 @@ public class RegistrationPanel extends JPanel {
 
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // Padding
+        gbc.insets = new Insets(10, 10, 10, 10);
 
-        // --- UI Layout ---
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(new JLabel("Full Name:"), gbc);
@@ -53,8 +46,7 @@ public class RegistrationPanel extends JPanel {
         gbc.gridx = 1;
         gbc.gridy = 2;
         add(passwordField, gbc);
-        
-        // Panel to hold the buttons
+
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.add(registerButton);
         buttonPanel.add(backToLoginButton);
@@ -65,14 +57,10 @@ public class RegistrationPanel extends JPanel {
         gbc.anchor = GridBagConstraints.CENTER;
         add(buttonPanel, gbc);
 
-        // --- Action Listeners ---
         registerButton.addActionListener(e -> handleRegister());
         backToLoginButton.addActionListener(e -> mainFrame.showLoginPanel());
     }
 
-    /**
-     * Handles the register button click event.
-     */
     private void handleRegister() {
         String fullName = fullNameField.getText();
         String email = emailField.getText();
@@ -91,13 +79,9 @@ public class RegistrationPanel extends JPanel {
         try {
             userDAO.registerUser(user);
             JOptionPane.showMessageDialog(this, "Registration Successful! You can now log in.", "Success", JOptionPane.INFORMATION_MESSAGE);
-            
-            // On success, automatically navigate back to the login screen
             mainFrame.showLoginPanel();
-
         } catch (SQLException ex) {
-            // Check for a duplicate email error specifically
-            if (ex.getSQLState().equals("23505")) { // PostgreSQL unique violation code
+            if (ex.getSQLState().equals("23505")) {
                 JOptionPane.showMessageDialog(this, "This email address is already registered.", "Registration Failed", JOptionPane.ERROR_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "A database error occurred: " + ex.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
