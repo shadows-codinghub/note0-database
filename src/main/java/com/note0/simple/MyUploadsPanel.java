@@ -118,12 +118,21 @@ public class MyUploadsPanel extends JPanel {
                     "The uploaded file will remain in Cloudinary storage.", 
                     "Confirm Deletion", JOptionPane.YES_NO_OPTION);
                 
-                if (confirm == JOptionPane.YES_OPTION) {
+                // ... inside your delete method ...
 
-                    materialDAO.deleteMaterial(material.getId());
-                    JOptionPane.showMessageDialog(this, "Upload deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                    loadMyUploads(); // Refresh the list
-                }
+        // ADD THIS LINE BACK - This is what creates the 'confirm' variable
+        int confirm = JOptionPane.showConfirmDialog(this, 
+            "Are you sure you want to delete '" + material.getTitle() + "'?", 
+            "Confirm Deletion", 
+            JOptionPane.YES_NO_OPTION);
+        
+        // Now this 'if' statement will work
+        if (confirm == JOptionPane.YES_OPTION) { 
+            materialDAO.deleteMaterial(material.getId());
+            JOptionPane.showMessageDialog(this, "Upload deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadMyUploads(); // Refresh the list
+        }
+// ...
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error deleting upload: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);

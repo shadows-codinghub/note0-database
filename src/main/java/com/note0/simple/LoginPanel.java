@@ -13,6 +13,7 @@ public class LoginPanel extends JPanel {
     private JPasswordField passwordField = new JPasswordField(20);
     private JButton loginButton = new JButton("Login");
     private JButton registerButton = new JButton("Go to Register");
+    private JPanel formPanel; // <-- Made formPanel a field to disable it
 
     public LoginPanel(MainFrame mainFrame, UserDAO userDAO) {
         this.mainFrame = mainFrame;
@@ -23,11 +24,13 @@ public class LoginPanel extends JPanel {
         setBackground(UITheme.APP_BACKGROUND); // Use theme background
 
         // --- Create the main form panel ---
-        JPanel formPanel = new JPanel(new GridBagLayout());
+        // Use the class field
+        formPanel = new JPanel(new GridBagLayout()); 
         formPanel.setBackground(UITheme.CARD_BACKGROUND); // White card background
         formPanel.setBorder(UITheme.createShadowBorder()); // Apply neo-brutalism shadow border
         
         GridBagConstraints gbc = new GridBagConstraints();
+// ... (rest of the constructor code is identical) ...
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
@@ -92,12 +95,16 @@ public class LoginPanel extends JPanel {
         
         // --- Add the form panel to the main panel (which centers it) ---
         add(formPanel, new GridBagConstraints());
+// ... (rest of the constructor code is identical) ...
 
         // Add Action Listeners
         loginButton.addActionListener(e -> handleLogin());
         registerButton.addActionListener(e -> mainFrame.showRegistrationPanel());
     }
 
+    /**
+     * Handles the login logic using a SwingWorker for a non-blocking UI.
+     */
     private void handleLogin() {
         String email = emailField.getText();
         String password = new String(passwordField.getPassword());
@@ -107,16 +114,50 @@ public class LoginPanel extends JPanel {
             return;
         }
 
-        try {
-            User user = userDAO.loginUser(email, password);
-            if (user != null) {
-                mainFrame.showFeedPanel(user);
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+        // Show the loading panel FIRST
+        mainFrame.showLoadingPanel();
+
+        // Create a SwingWorker to run the database call on a background thread
+        SwingWorker<User, Void> worker = new SwingWorker<User, Void>() {
+            
+            /**
+             * This runs on a background thread.
+             * No Swing UI code here!
+             */
+            @Override
+            protected User doInBackground() throws Exception {
+                // This is the long-running task
+                return userDAO.loginUser(email, password);
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Database error during login: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
+
+            /**
+             * This runs on the UI thread after doInBackground() finishes.
+             * Safe to update the UI here.
+             */
+            @Override
+            protected void done() {
+                try {
+                    User user = get(); // Get the result from doInBackground()
+                    
+                    if (user != null) {
+                        // Success! Show the main app feed
+                        mainFrame.showFeedPanel(user);
+                    } else {
+                        // Login failed, show error and go back to login panel
+                        JOptionPane.showMessageDialog(mainFrame, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+                        mainFrame.showLoginPanel();
+                    }
+                } catch (Exception e) {
+                    // Database or other error, show error and go back to login panel
+                    JOptionPane.showMessageDialog(mainFrame, "Database error during login: " + e.getMessage(), "Database Error", JOptionPane.ERROR_MESSAGE);
+                    mainFrame.showLoginPanel();
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        // Start the worker
+        worker.execute();
     }
 }
+

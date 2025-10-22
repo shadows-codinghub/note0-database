@@ -20,6 +20,13 @@ public class MainFrame extends JFrame {
     private final SubjectDAO subjectDAO;
     private final CloudinaryService cloudinaryService;
 
+    // Define panel names as constants for easy reference
+    public static final String LOGIN_PANEL_ID = "LOGIN_PANEL";
+    public static final String REGISTER_PANEL_ID = "REGISTER_PANEL";
+    public static final String LOADING_PANEL_ID = "LOADING_PANEL";
+    public static final String MAIN_APP_PANEL_ID = "MAIN_APP_PANEL";
+
+
     public MainFrame() {
         this.userDAO = new UserDAO();
         this.materialDAO = new MaterialDAO();
@@ -38,23 +45,35 @@ public class MainFrame extends JFrame {
         mainPanel = new JPanel(cardLayout);
         mainPanel.setBackground(UITheme.APP_BACKGROUND); // Set main panel background
 
+        // Create all panels
         LoginPanel loginPanel = new LoginPanel(this, userDAO);
         RegistrationPanel registrationPanel = new RegistrationPanel(this, userDAO);
+        LoadingPanel loadingPanel = new LoadingPanel(); // <-- ADDED
 
-        mainPanel.add(loginPanel, "LOGIN_PANEL");
-        mainPanel.add(registrationPanel, "REGISTER_PANEL");
+        // Add panels to the card layout
+        mainPanel.add(loginPanel, LOGIN_PANEL_ID);
+        mainPanel.add(registrationPanel, REGISTER_PANEL_ID);
+        mainPanel.add(loadingPanel, LOADING_PANEL_ID); // <-- ADDED
 
         add(mainPanel);
 
-        cardLayout.show(mainPanel, "LOGIN_PANEL");
+        cardLayout.show(mainPanel, LOGIN_PANEL_ID);
     }
 
     public void showLoginPanel() {
-        cardLayout.show(mainPanel, "LOGIN_PANEL");
+        cardLayout.show(mainPanel, LOGIN_PANEL_ID);
     }
 
     public void showRegistrationPanel() {
-        cardLayout.show(mainPanel, "REGISTER_PANEL");
+        cardLayout.show(mainPanel, REGISTER_PANEL_ID);
+    }
+
+    /**
+     * Shows the loading panel.
+     * This is called right before a long task (like login) starts.
+     */
+    public void showLoadingPanel() {
+        cardLayout.show(mainPanel, LOADING_PANEL_ID);
     }
 
     public void showFeedPanel(User user) {
@@ -77,8 +96,16 @@ public class MainFrame extends JFrame {
             tabbedPane.addTab("Admin", adminPanel);
         }
 
-        mainPanel.add(tabbedPane, "MAIN_APP_PANEL");
-        cardLayout.show(mainPanel, "MAIN_APP_PANEL");
+        // We use a constant here, but we must add the component.
+        // It's safer to remove the old one if it exists.
+        Component[] components = mainPanel.getComponents();
+        for (Component component : components) {
+            if (component instanceof JTabbedPane) {
+                mainPanel.remove(component);
+            }
+        }
+        mainPanel.add(tabbedPane, MAIN_APP_PANEL_ID);
+        cardLayout.show(mainPanel, MAIN_APP_PANEL_ID);
     }
 
     public void showDashboardPanel(User user) {
@@ -87,3 +114,4 @@ public class MainFrame extends JFrame {
         showFeedPanel(user); 
     }
 }
+

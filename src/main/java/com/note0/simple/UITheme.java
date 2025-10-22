@@ -9,91 +9,101 @@ import javax.swing.border.CompoundBorder;
 
 /**
  * A utility class to hold all the common colors, fonts, and styles
- * for the application to ensure a consistent neo-brutalism look and feel.
+ * for the application to ensure a consistent "dark" look and feel.
+ * * This palette is inspired by the "Dracula" theme.
  */
 public class UITheme {
 
-    // --- Colors ---
-    // A light, warm, off-white for the background
-    public static final Color APP_BACKGROUND = new Color(248, 244, 236);
-    // Pure white for content cards to contrast with the background
-    public static final Color CARD_BACKGROUND = Color.WHITE;
-    // Pure black for text and borders for high contrast
-    public static final Color TEXT_COLOR = Color.BLACK;
-    public static final Color BORDER_COLOR = Color.BLACK;
-    // A bright, vibrant blue for primary actions
-    public static final Color ACCENT_COLOR = new Color(0, 86, 255);
-    // A strong red for danger actions
-    public static final Color DANGER_COLOR = new Color(255, 59, 48);
-    // A simple gray for secondary text or actions
-    public static final Color SECONDARY_COLOR = new Color(108, 117, 125);
+    // --- Colors (Dracula Palette) ---
+    // A very dark purple-gray for the main background
+    public static final Color APP_BACKGROUND = new Color(40, 42, 54);
+    // A lighter purple-gray for content cards
+    public static final Color CARD_BACKGROUND = new Color(68, 71, 90);
+    // An off-white for all text
+    public static final Color TEXT_COLOR = new Color(248, 248, 242);
+    // A light purple for borders
+    public static final Color BORDER_COLOR = new Color(98, 114, 164);
+    // A bright, "electric" cyan for primary actions
+    public static final Color ACCENT_COLOR = new Color(80, 250, 212);
+    // A bright pink for danger actions
+    public static final Color DANGER_COLOR = new Color(255, 121, 198);
+    // A calm blue-gray for secondary buttons
+    public static final Color SECONDARY_COLOR = new Color(144, 153, 174);
 
     // --- Fonts ---
     public static final Font HEADING_FONT = new Font("SansSerif", Font.BOLD, 28);
     public static final Font LABEL_FONT = new Font("SansSerif", Font.BOLD, 14);
     public static final Font BODY_FONT = new Font("SansSerif", Font.PLAIN, 14);
 
-
     // --- Borders ---
-    // Increased padding for a cleaner look
     public static final Border APP_PADDING = BorderFactory.createEmptyBorder(20, 20, 20, 20);
-    // The main border style for buttons
-    private static final Border BUTTON_BORDER = new CompoundBorder(
-            BorderFactory.createLineBorder(BORDER_COLOR, 2), // 2px black line
-            BorderFactory.createEmptyBorder(10, 20, 10, 20)  // 10px vertical, 20px horizontal padding
+    
+    // A border for secondary buttons (dark card, light text)
+    private static final Border SECONDARY_BUTTON_BORDER = new CompoundBorder(
+            BorderFactory.createLineBorder(SECONDARY_COLOR, 2), // Use secondary color
+            BorderFactory.createEmptyBorder(10, 20, 10, 20)
     );
 
     /**
-     * Creates the signature neo-brutalist shadow border.
-     * It's a 2px black border combined with a 4px black shadow, offset down and to the right.
+     * Creates the neo-brutalism shadow border, adapted for a dark theme.
+     * It has a light purple border and a black shadow.
      * @return A composed Border object.
      */
     public static Border createShadowBorder() {
         Border contentBorder = new CompoundBorder(
-                BorderFactory.createLineBorder(BORDER_COLOR, 2), // The main 2px black border
+                BorderFactory.createLineBorder(BORDER_COLOR, 2), // The light purple border
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)  // 15px internal padding
         );
         
-        // This MatteBorder creates the shadow: 0px top, 0px left, 4px bottom, 4px right
-        Border shadow = BorderFactory.createMatteBorder(0, 0, 4, 4, BORDER_COLOR);
+        // The shadow is a simple black offset border
+        Border shadow = BorderFactory.createMatteBorder(0, 0, 4, 4, Color.BLACK);
 
         // Combine the shadow (outside) and the content border (inside)
         return new CompoundBorder(shadow, contentBorder);
     }
 
     /**
-     * Styles a JButton as a primary action button.
+     * Styles a JButton as a primary action button (Bright Cyan).
      * @param button The JButton to style.
      */
     public static void stylePrimaryButton(JButton button) {
-        button.setBackground(ACCENT_COLOR);
-        button.setForeground(Color.WHITE);
+        Border border = new CompoundBorder(
+            BorderFactory.createLineBorder(Color.BLACK, 2), // Black outline
+            BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        );
+        button.setBackground(ACCENT_COLOR); // Bright Cyan
+        button.setForeground(Color.BLACK);  // Black text for high contrast
         button.setFont(LABEL_FONT);
-        button.setBorder(BUTTON_BORDER);
+        button.setBorder(border);
         button.setOpaque(true);
     }
 
     /**
-     * Styles a JButton to look like a "secondary" (e.g., refresh) button.
+     * Styles a JButton as a "secondary" button (Gray on Dark).
      * @param button The JButton to style.
      */
     public static void styleSecondaryButton(JButton button) {
-        button.setBackground(CARD_BACKGROUND);
-        button.setForeground(TEXT_COLOR);
+        button.setBackground(CARD_BACKGROUND); // Dark card color
+        button.setForeground(TEXT_COLOR);      // Light text
         button.setFont(LABEL_FONT);
-        button.setBorder(BUTTON_BORDER);
+        button.setBorder(SECONDARY_BUTTON_BORDER); // Light purple border
         button.setOpaque(true);
     }
 
     /**
-     * Styles a JButton to look like a "danger" (e.g., delete) button.
+     * Styles a JButton as a "danger" button (Bright Pink).
      * @param button The JButton to style.
      */
     public static void styleDangerButton(JButton button) {
-        button.setBackground(DANGER_COLOR);
-        button.setForeground(Color.WHITE);
+        Border border = new CompoundBorder(
+            BorderFactory.createLineBorder(Color.BLACK, 2), // Black outline
+            BorderFactory.createEmptyBorder(10, 20, 10, 20)
+        );
+        button.setBackground(DANGER_COLOR); // Bright Pink
+        button.setForeground(Color.BLACK);  // Black text for high contrast
         button.setFont(LABEL_FONT);
-        button.setBorder(BUTTON_BORDER);
+        button.setBorder(border);
         button.setOpaque(true);
     }
 }
+
