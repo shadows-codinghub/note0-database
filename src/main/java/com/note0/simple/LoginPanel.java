@@ -18,44 +18,67 @@ public class LoginPanel extends JPanel {
         this.mainFrame = mainFrame;
         this.userDAO = userDAO;
 
+        // Use a GridBagLayout to center the form panel
         setLayout(new GridBagLayout());
+        setBackground(UITheme.APP_BACKGROUND); // Use theme background
+
+        // --- Create the main form panel ---
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(UITheme.CARD_BACKGROUND); // White card background
+        formPanel.setBorder(UITheme.createShadowBorder()); // Apply neo-brutalism shadow border
+        
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Title
         JLabel titleLabel = new JLabel("Note0 Login");
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        titleLabel.setFont(UITheme.HEADING_FONT); // Use theme heading font
+        titleLabel.setForeground(UITheme.TEXT_COLOR);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        add(titleLabel, gbc);
+        gbc.insets = new Insets(10, 10, 20, 10); // More padding below title
+        formPanel.add(titleLabel, gbc);
 
-        // Email
+        // --- Reset constraints for fields ---
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        
+        // Email
+        JLabel emailLabel = new JLabel("Email:");
+        emailLabel.setFont(UITheme.LABEL_FONT);
         gbc.gridx = 0;
         gbc.gridy = 1;
-        add(new JLabel("Email:"), gbc);
+        formPanel.add(emailLabel, gbc);
 
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx = 1;
         gbc.gridy = 1;
-        add(emailField, gbc);
+        formPanel.add(emailField, gbc);
 
         // Password
+        JLabel passLabel = new JLabel("Password:");
+        passLabel.setFont(UITheme.LABEL_FONT);
         gbc.anchor = GridBagConstraints.EAST;
         gbc.gridx = 0;
         gbc.gridy = 2;
-        add(new JLabel("Password:"), gbc);
+        formPanel.add(passLabel, gbc);
 
         gbc.anchor = GridBagConstraints.WEST;
         gbc.gridx = 1;
         gbc.gridy = 2;
-        add(passwordField, gbc);
+        formPanel.add(passwordField, gbc);
 
         // Buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        buttonPanel.setBackground(UITheme.CARD_BACKGROUND); // Match card background
+        
+        UITheme.stylePrimaryButton(loginButton); // Style the login button
+        UITheme.styleSecondaryButton(registerButton); // Style the register button
+
         buttonPanel.add(loginButton);
         buttonPanel.add(registerButton);
 
@@ -63,7 +86,12 @@ public class LoginPanel extends JPanel {
         gbc.gridy = 3;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        add(buttonPanel, gbc);
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(20, 10, 10, 10); // More padding above buttons
+        formPanel.add(buttonPanel, gbc);
+        
+        // --- Add the form panel to the main panel (which centers it) ---
+        add(formPanel, new GridBagConstraints());
 
         // Add Action Listeners
         loginButton.addActionListener(e -> handleLogin());

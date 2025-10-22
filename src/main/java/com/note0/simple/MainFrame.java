@@ -8,8 +8,7 @@ import java.awt.*;
  * This class holds and manages the different panels (Login, Register, Feed, Dashboard)
  * using a CardLayout, allowing for seamless navigation between different views
  * without opening or closing new windows.
- * 
- * New Navigation Flow: Login -> Main App (with tabs) -> specific tabs
+ * * New Navigation Flow: Login -> Main App (with tabs) -> specific tabs
  */
 public class MainFrame extends JFrame {
 
@@ -32,8 +31,12 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        // Set the frame's content pane background
+        getContentPane().setBackground(UITheme.APP_BACKGROUND);
+
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
+        mainPanel.setBackground(UITheme.APP_BACKGROUND); // Set main panel background
 
         LoginPanel loginPanel = new LoginPanel(this, userDAO);
         RegistrationPanel registrationPanel = new RegistrationPanel(this, userDAO);
@@ -56,6 +59,9 @@ public class MainFrame extends JFrame {
 
     public void showFeedPanel(User user) {
         JTabbedPane tabbedPane = new JTabbedPane();
+        // Apply theme font to tabs
+        tabbedPane.setFont(UITheme.LABEL_FONT);
+        tabbedPane.setBackground(UITheme.APP_BACKGROUND);
 
         FeedPanel feedPanel = new FeedPanel(this, user, materialDAO, subjectDAO, cloudinaryService);
         tabbedPane.addTab("Home", feedPanel);
