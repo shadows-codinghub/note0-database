@@ -65,11 +65,14 @@ Secondly i would also like to thank my parents and friends who helped me a lot i
 <pre>
 Chapter 1: Introduction
     1.1 Project Overview
-    1.2 Project Goals and Objectives
+    1.2 Problem Statement
+    1.3 Scope of the Project
+    1.4 Project Goals and Objectives
 Chapter 2: System Architecture
     2.1 High-Level Architecture
-    2.2 Component Diagram
-    2.3 Flowchart
+    2.2 Two-Tier Architecture
+    2.3 Component Diagram
+    2.4 Flowchart
 Chapter 3: Component Analysis
     3.1 UI Components
     3.2 Data Access Objects (DAOs)
@@ -143,7 +146,21 @@ Chapter 9: Conclusion
 <h2>1.1 Project Overview</h2>
 <p style="text-align: justify; line-height: 1.5;">The Note0 project is a desktop-based note-sharing application designed for students and educators. It provides a simple and efficient platform for sharing and accessing educational materials. Built using Java Swing for the frontend and backed by a PostgreSQL database, the application offers a robust and scalable solution for academic collaboration. The project emphasizes security, usability, and a modern user experience through the integration of various third-party libraries.</p>
 
-<h2>1.2 Project Goals and Objectives</h2>
+<h2>1.2 Problem Statement</h2>
+<p style="text-align: justify; line-height: 1.5;">In many educational institutions, the process of sharing and accessing study materials is often fragmented and inefficient. Students and teachers rely on a variety of platforms, such as email, social media, and physical copies, which can lead to disorganization and difficulty in finding relevant materials. The Note0 project aims to solve this problem by providing a centralized and dedicated platform for academic note sharing.</p>
+
+<h2>1.3 Scope of the Project</h2>
+<p style="text-align: justify; line-height: 1.5;">The scope of this project is to develop a desktop application with the following key functionalities:
+<ul>
+    <li>User registration and login</li>
+    <li>Secure password storage</li>
+    <li>Role-based access control (USER and ADMIN roles)</li>
+    <li>Uploading and viewing of educational materials</li>
+    <li>An administrative panel for user and content management</li>
+</ul>
+The project is designed to be a proof-of-concept for a more extensive note-sharing platform.</p>
+
+<h2>1.4 Project Goals and Objectives</h2>
 <p style="text-align: justify; line-height: 1.5;">The primary goal of the Note0 project is to create a centralized platform for note sharing. The key objectives are:</p>
 <ul>
     <li>To develop a secure user authentication system.</li>
@@ -162,14 +179,22 @@ Chapter 9: Conclusion
 <h2>2.1 High-Level Architecture</h2>
 <p style="text-align: justify; line-height: 1.5;">The application follows a two-tier client-server architecture. The Java Swing application serves as the client, providing the user interface and business logic. The PostgreSQL database acts as the server, storing all application data. The application also interacts with the external Cloudinary service for file storage.</p>
 
-<h2>2.2 Component Diagram</h2>
+<h2>2.2 Two-Tier Architecture</h2>
+<p style="text-align: justify; line-height: 1.5;">In this two-tier model:
+<ul>
+    <li><b>Client-Tier:</b> The Java Swing application is the client. It is responsible for presenting the user interface and handling user interactions. It communicates directly with the database to retrieve and store data.</li>
+    <li><b>Data-Tier:</b> The PostgreSQL database is the data tier. It stores all the application data, including user information, materials, and subjects. The database is responsible for data persistence and integrity.</li>
+</ul>
+This architecture is simple to implement and is well-suited for a small to medium-sized application like Note0.</p>
+
+<h2>2.3 Component Diagram</h2>
 <p style="text-align: justify; line-height: 1.5;"><b>Figure 1: System Architecture Diagram</b></p>
 <center>
 <img src="[PLACEHOLDER_FOR_SYSTEM_ARCHITECTURE_DIAGRAM]" alt="System Architecture Diagram">
 </center>
 <p style="text-align: justify; line-height: 1.5;">The diagram above illustrates the interaction between the Java client, the PostgreSQL database, and the Cloudinary service.</p>
 
-<h2>2.3 Flowchart</h2>
+<h2>2.4 Flowchart</h2>
 <p style="text-align: justify; line-height: 1.5;"><b>Figure 2: Application Flowchart</b></p>
 <center>
 <img src="[PLACEHOLDER_FOR_APPLICATION_FLOWCHART]" alt="Application Flowchart">
@@ -186,24 +211,26 @@ Chapter 9: Conclusion
 <h2>3.1 UI Components</h2>
 <p style="text-align: justify; line-height: 1.5;">The user interface is built using Java Swing and is organized into several panels, each responsible for a specific functionality:</p>
 <ul>
-    <li><b>MainFrame:</b> The main window of the application that holds all other UI components.</li>
-    <li><b>WelcomeForm/LoginPanel/RegistrationPanel:</b> Components responsible for the initial user interaction, including login and registration. The LoginPanel authenticates users, and the RegistrationPanel allows new users to create an account.</li>
+    <li><b>MainFrame:</b> The main window of the application that holds all other UI components. It manages the card layout to switch between different panels.</li>
+    <li><b>WelcomeForm:</b> The initial screen that provides options to navigate to the Login or Registration panels.</li>
+    <li><b>LoginPanel:</b> Provides the user interface for logging in. It contains text fields for email and password, a login button, and a link to the registration panel.</li>
+    <li><b>RegistrationPanel:</b> Provides the user interface for new user registration. It includes fields for full name, email, password, college, and semester.</li>
 </ul>
 <p style="text-align: justify; line-height: 1.5;"><b>Figure 4: Login Screen Screenshot</b></p>
 <center>
 <img src="[PLACEHOLDER_FOR_LOGIN_SCREEN_SCREENSHOT]" alt="Login Screen Screenshot">
 </center>
 <ul>
-    <li><b>DashboardPanel:</b> The main dashboard displayed after a user logs in. It provides navigation to the Feed, Profile, and Admin panels.</li>
+    <li><b>DashboardPanel:</b> The main user dashboard after login. It contains a sidebar for navigation and a main content area to display different panels like Feed, Profile, and Admin.</li>
 </ul>
 <p style="text-align: justify; line-height: 1.5;"><b>Figure 5: Dashboard Screenshot</b></p>
 <center>
 <img src="[PLACEHOLDER_FOR_DASHBOARD_SCREENSHOT]" alt="Dashboard Screenshot">
 </center>
 <ul>
-    <li><b>FeedPanel:</b> Displays a feed of shared materials, allowing users to browse and upload new materials.</li>
-    <li><b>ProfilePanel:</b> Allows users to view and manage their profile.</li>
-    <li><b>AdminPanel:</b> Provides administrative functionalities for user management, including user verification and material approval.</li>
+    <li><b>FeedPanel:</b> Displays a scrollable feed of study materials. Each material is displayed with its title, description, uploader, and subject. It also includes an "Upload" button to add new materials.</li>
+    <li><b>ProfilePanel:</b> Shows the profile information of the logged-in user.</li>
+    <li><b>AdminPanel:</b> A special panel visible only to admin users. It allows admins to view a list of all users and approve or reject uploaded materials.</li>
 </ul>
 <p style="text-align: justify; line-height: 1.5;"><b>Figure 6: Admin Panel Screenshot</b></p>
 <center>
@@ -215,7 +242,7 @@ Chapter 9: Conclusion
 <p style="text-align: justify; line-height: 1.5;">Data persistence is managed by a set of Data Access Objects (DAOs):</p>
 <ul>
     <li><b>UserDAO:</b> Handles all database operations related to users, such as creating, retrieving, and updating user information. It includes methods for user registration, login with password verification (using jBCrypt), and fetching all users for the admin panel.</li>
-    <li><b>SubjectDAO:</b> Manages the subjects available in the application.</li>
+    <li><b>SubjectDAO:</b> Manages the subjects available in the application. It has methods to get all subjects from the database.</li>
     <li><b>MaterialDAO:</b> Responsible for database operations related to materials, including creation, retrieval, and updates. It fetches all materials for the feed and allows for material approval by admins.</li>
 </ul>
 
@@ -249,47 +276,47 @@ Chapter 9: Conclusion
     <tr>
         <td>id</td>
         <td>SERIAL</td>
-        <td>Primary Key</td>
+        <td>Primary Key - Auto-incrementing integer to uniquely identify each user.</td>
     </tr>
     <tr>
         <td>full_name</td>
         <td>VARCHAR</td>
-        <td>Full name of the user</td>
+        <td>Full name of the user.</td>
     </tr>
     <tr>
         <td>email</td>
         <td>VARCHAR</td>
-        <td>Email of the user (unique)</td>
+        <td>Email of the user, used for login and must be unique.</td>
     </tr>
     <tr>
         <td>password_hash</td>
         <td>VARCHAR</td>
-        <td>Hashed password</td>
+        <td>Hashed password for secure storage.</td>
     </tr>
     <tr>
         <td>role</td>
         <td>VARCHAR</td>
-        <td>Role of the user (e.g., USER, ADMIN)</td>
+        <td>Role of the user, which can be 'USER' or 'ADMIN'.</td>
     </tr>
     <tr>
         <td>is_active</td>
         <td>BOOLEAN</td>
-        <td>Indicates if the user account is active</td>
+        <td>Indicates if the user account is active.</td>
     </tr>
     <tr>
         <td>is_verified</td>
         <td>BOOLEAN</td>
-        <td>Indicates if the user is verified</td>
+        <td>Indicates if the user is verified by an admin.</td>
     </tr>
     <tr>
         <td>college_name</td>
         <td>VARCHAR</td>
-        <td>Name of the user\'s college</td>
+        <td>Name of the user\'s college.</td>
     </tr>
     <tr>
         <td>semester</td>
         <td>INTEGER</td>
-        <td>Current semester of the user</td>
+        <td>Current semester of the user.</td>
     </tr>
 </table>
 <br>
@@ -303,12 +330,12 @@ Chapter 9: Conclusion
     <tr>
         <td>id</td>
         <td>SERIAL</td>
-        <td>Primary Key</td>
+        <td>Primary Key - Auto-incrementing integer to uniquely identify each subject.</td>
     </tr>
     <tr>
         <td>name</td>
         <td>VARCHAR</td>
-        <td>Name of the subject</td>
+        <td>Name of the subject.</td>
     </tr>
 </table>
 <br>
@@ -322,57 +349,57 @@ Chapter 9: Conclusion
     <tr>
         <td>id</td>
         <td>SERIAL</td>
-        <td>Primary Key</td>
+        <td>Primary Key - Auto-incrementing integer to uniquely identify each material.</td>
     </tr>
     <tr>
         <td>title</td>
         <td>VARCHAR</td>
-        <td>Title of the material</td>
+        <td>Title of the material.</td>
     </tr>
     <tr>
         <td>description</td>
         <td>TEXT</td>
-        <td>Description of the material</td>
+        <td>A brief description of the material.</td>
     </tr>
     <tr>
         <td>file_type</td>
         <td>VARCHAR</td>
-        <td>Type of the file (e.g., PDF, DOCX)</td>
+        <td>The type of the uploaded file (e.g., PDF, DOCX).</td>
     </tr>
     <tr>
         <td>file_path</td>
         <td>VARCHAR</td>
-        <td>URL or path to the file</td>
+        <td>The URL or path to the file stored in Cloudinary.</td>
     </tr>
     <tr>
         <td>module_number</td>
         <td>INTEGER</td>
-        <td>Module number the material belongs to</td>
+        <td>The module number the material belongs to.</td>
     </tr>
     <tr>
         <td>uploader_id</td>
         <td>INTEGER</td>
-        <td>Foreign key to the users table</td>
+        <td>Foreign key referencing the `id` of the user who uploaded the material.</td>
     </tr>
     <tr>
         <td>subject_id</td>
         <td>INTEGER</td>
-        <td>Foreign key to the subjects table</td>
+        <td>Foreign key referencing the `id` of the subject the material belongs to.</td>
     </tr>
     <tr>
         <td>avg_rating</td>
         <td>NUMERIC</td>
-        <td>Average rating of the material</td>
+        <td>The average rating of the material.</td>
     </tr>
     <tr>
         <td>upload_date</td>
         <td>TIMESTAMP</td>
-        <td>Date and time of upload</td>
+        <td>The date and time when the material was uploaded.</td>
     </tr>
     <tr>
         <td>approval_status</td>
         <td>VARCHAR</td>
-        <td>Approval status of the material (e.g., PENDING, APPROVED)</td>
+        <td>The approval status of the material (e.g., PENDING, APPROVED, REJECTED).</td>
     </tr>
 </table>
 
@@ -385,46 +412,54 @@ Chapter 9: Conclusion
 <p style="text-align: justify; line-height: 1.5;">This is the entry point of the application. Its `main` method uses `SwingUtilities.invokeLater` to ensure that the GUI is created on the Event Dispatch Thread (EDT), which is essential for a stable Swing application. It first creates an instance of `UserDAO` to ensure the admin user exists, and then it creates and displays the `MainFrame`.</p>
 
 <h2>5.2 com.note0.simple.MainFrame</h2>
-<p style="text-align: justify; line-height: 1.5;">This class extends `JFrame` and serves as the main window of the application. It manages the currently logged-in user and handles the switching between different panels (e.g., `WelcomeForm`, `DashboardPanel`). It holds the central logic for navigating through the application.</p>
+<p style="text-align: justify; line-height: 1.5;">This class extends `JFrame` and serves as the main window of the application. It uses a `CardLayout` to manage and switch between different panels. It holds a reference to the currently logged-in user and provides methods to show different panels like the welcome screen, login, registration, and dashboard.</p>
 
 <h2>5.3 com.note0.simple.WelcomeForm</h2>
-<p style="text-align: justify; line-height: 1.5;">This is the initial screen that users see. It presents two options: "Login" and "Register". It acts as a simple navigational panel to either the `LoginPanel` or the `RegistrationPanel`.</p>
+<p style="text-align: justify; line-height: 1.5;">This panel is the initial screen that users see. It presents two buttons: "Login" and "Register". Action listeners on these buttons call methods in `MainFrame` to switch to the `LoginPanel` or `RegistrationPanel` respectively.</p>
 
 <h2>5.4 com.note0.simple.LoginForm & com.note0.simple.LoginPanel</h2>
-<p style="text-align: justify; line-height: 1.5;">The `LoginPanel` provides the GUI for the login form, including fields for email and password. The `LoginForm` (which is likely the panel itself or a class that uses it) contains the logic for authenticating the user. It uses the `UserDAO` to verify the user's credentials. If the credentials are valid, it notifies the `MainFrame` to switch to the `DashboardPanel`.</p>
+<p style="text-align: justify; line-height: 1.5;">The `LoginPanel` provides the GUI for the login form, including fields for email and password, a "Login" button, and a link to the registration panel. When the login button is clicked, it retrieves the email and password, and calls the `loginUser` method of the `UserDAO`. If the login is successful, the `MainFrame` is notified to switch to the `DashboardPanel`.</p>
 
 <h2>5.5 com.note0.simple.RegistrationForm & com.note0.simple.RegistrationPanel</h2>
-<p style="text-align: justify; line-height: 1.5;">Similar to the login components, the `RegistrationPanel` provides the form for new users to register. The `RegistrationForm` collects user information (full name, email, password, etc.) and uses the `UserDAO` to create a new user in the database. Passwords are hashed using `jBCrypt` before being stored.</p>
+<p style="text-align: justify; line-height: 1.5;">The `RegistrationPanel` provides the form for new users to register. It includes fields for full name, email, password, college, and semester. Upon clicking the "Register" button, the input is validated, a new `User` object is created, and the `registerUser` method of the `UserDAO` is called to save the new user to the database.</p>
 
 <h2>5.6 com.note0.simple.DashboardPanel</h2>
-<p style="text-align: justify; line-height: 1.5;">This panel is the main hub for logged-in users. It typically contains navigation elements to access the different features of the application, such as the `FeedPanel`, `ProfilePanel`, and, if the user is an admin, the `AdminPanel`.</p>
+<p style="text-align: justify; line-height: 1.5;">This panel serves as the main dashboard for logged-in users. It has a sidebar with navigation buttons for "Feed", "Profile", and "Logout". If the user is an admin, an "Admin" button is also displayed. The main content area of the dashboard uses a `CardLayout` to display the `FeedPanel`, `ProfilePanel`, or `AdminPanel` based on the user's selection.</p>
 
 <h2>5.7 com.note0.simple.FeedPanel</h2>
-<p style="text-align: justify; line-height: 1.5;">The `FeedPanel` is responsible for displaying the list of shared materials. It uses the `MaterialDAO` to fetch the materials from the database and displays them in a user-friendly format, likely a list or a grid. It also includes functionality for uploading new materials, which involves file selection and interaction with the `CloudinaryService`.</p>
+<p style="text-align: justify; line-height: 1.5;">The `FeedPanel` is responsible for displaying the list of shared materials. It fetches all approved materials from the database using the `MaterialDAO` and displays them in a `JScrollPane`. Each material is displayed in a separate panel that shows the title, description, uploader, and subject. An "Upload" button allows users to open a file chooser and upload a new material.</p>
 
 <h2>5.8 com.note0.simple.ProfilePanel</h2>
-<p style="text-align: justify; line-height: 1.5;">This panel allows users to view their own information, such as their name, email, and college. It retrieves the user's data from the `User` object stored in the `MainFrame`.</p>
+<p style="text-align: justify; line-height: 1.5;">This panel displays the information of the currently logged-in user, including their name, email, college, and semester. The data is retrieved from the `User` object stored in the `MainFrame`.</p>
 
 <h2>5.9 com.note0.simple.AdminPanel & com.note0.simple.AdminForm</h2>
-<p style="text-align: justify; line-height: 1.5;">These components are only accessible to administrators. The `AdminPanel` displays a list of users and unapproved materials, fetched using the `UserDAO` and `MaterialDAO`. The `AdminForm` provides the interface for an admin to take actions, such as verifying users or approving materials.</p>
+<p style="text-align: justify; line-height: 1.5;">These components are exclusively for admin users. The `AdminPanel` shows two tabs: one for managing users and another for approving materials. The user management tab displays a list of all registered users. The material approval tab shows a list of materials with a "PENDING" status. The admin can then choose to "Approve" or "Reject" each material.</p>
 
 <h2>5.10 com.note0.simple.DatabaseManager</h2>
-<p style="text-align: justify; line-height: 1.5;">This class is responsible for managing the connection to the PostgreSQL database. It reads the database credentials from environment variables and provides a static method to get a database connection, which is used by all the DAOs.</p>
+<p style="text-align: justify; line-height: 1.5;">This class manages the connection to the PostgreSQL database. It reads the database URL, username, and password from environment variables and uses the `DriverManager` to establish a connection. It provides a static `getConnection` method that is used by all the DAO classes.</p>
 
 <h2>5.11 com.note0.simple.UserDAO</h2>
-<p style="text-align: justify; line-height: 1.5;">The `UserDAO` (Data Access Object) handles all database operations related to users. It contains methods for creating a new user, finding a user by email, and verifying a user's password using `jBCrypt`. It also has a method to create the initial admin user if one doesn't exist.</p>
+<p style="text-align: justify; line-height: 1.5;">The `UserDAO` handles all database operations related to users. Key methods include:
+- `registerUser(User user)`: Inserts a new user into the database, hashing the password with `jBCrypt`.
+- `loginUser(String email, String password)`: Retrieves a user by email and verifies the password using `jBCrypt`.
+- `createAdminUser()`: Creates a default admin user if one does not already exist.
+- `getAllUsers()`: Fetches a list of all users for the admin panel.</p>
 
 <h2>5.12 com.note0.simple.MaterialDAO</h2>
-<p style="text-align: justify; line-height: 1.5;">This DAO is responsible for all database operations related to materials. It has methods to insert a new material into the database, retrieve all materials, and update the approval status of a material.</p>
+<p style="text-align: justify; line-height: 1.5;">This DAO is responsible for all database operations related to materials. Its main methods are:
+- `uploadMaterial(Material material)`: Inserts a new material record into the database.
+- `getAllApprovedMaterials()`: Retrieves all materials that have been approved by an admin.
+- `getPendingMaterials()`: Fetches all materials with a "PENDING" status for the admin panel.
+- `updateMaterialStatus(int materialId, String status)`: Updates the approval status of a material.</p>
 
 <h2>5.13 com.note0.simple.SubjectDAO</h2>
-<p style="text-align: justify; line-height: 1.5;">The `SubjectDAO` manages the subjects in the database. It contains a method to retrieve all subjects, which are then used in the `FeedPanel` when a user uploads a new material.</p>
+<p style="text-align: justify; line-height: 1.5;">The `SubjectDAO` manages the subjects in the database. It has a `getAllSubjects()` method that retrieves all available subjects, which are used to populate a dropdown menu in the material upload form.</p>
 
 <h2>5.14 com.note0.simple.CloudinaryService</h2>
-<p style="text-align: justify; line-height: 1.5;">This service class encapsulates the logic for interacting with the Cloudinary API. It has a method that takes a file path as input, uploads the file to Cloudinary, and returns the public URL of the uploaded file.</p>
+<p style="text-align: justify; line-height: 1.5;">This service class encapsulates the logic for interacting with the Cloudinary API. It is configured with the cloud name, API key, and API secret from environment variables. The `uploadFile(String filePath)` method takes a local file path, uploads the file to Cloudinary, and returns the public URL of the uploaded file.</p>
 
 <h2>5.15 Data Models (User, Subject, Material)</h2>
-<p style="text-align: justify; line-height: 1.5;">These are plain old Java objects (POJOs) that represent the data structures of the application. They have fields that correspond to the columns in the database tables and are used to pass data between the different layers of the application.</p>
+<p style="text-align: justify; line-height: 1.5;">These are plain old Java objects (POJOs) that represent the data structures of the application. They have fields that correspond to the columns in the database tables and are used to pass data between the different layers of the application (e.g., from the UI to the DAOs).</p>
 
 
 <br><br><br>
@@ -462,10 +497,10 @@ Chapter 9: Conclusion
 <h2>8.1 Maven Dependencies</h2>
 <p style="text-align: justify; line-height: 1.5;">The project uses Apache Maven for dependency management. The key dependencies are:</p>
 <ul>
-    <li><b>postgresql:</b> For connecting to the PostgreSQL database.</li>
-    <li><b>jbcrypt:</b> For hashing user passwords.</li>
-    <li><b>cloudinary-http44:</b> For integrating with the Cloudinary file upload service.</li>
-    <li><b>flatlaf:</b> For a modern look and feel for the Swing user interface.</li>
+    <li><b>postgresql:</b> The JDBC driver for connecting to a PostgreSQL database.</li>
+    <li><b>jbcrypt:</b> A library for securely hashing and checking passwords.</li>
+    <li><b>cloudinary-http44:</b> The Java SDK for the Cloudinary service, used for file uploads.</li>
+    <li><b>flatlaf:</b> A modern look and feel for Java Swing applications.</li>
 </ul>
 
 <br><br><br>
