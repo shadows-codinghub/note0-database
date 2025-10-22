@@ -8,96 +8,86 @@ public class LoginPanel extends JPanel {
 
     private final MainFrame mainFrame;
     private final UserDAO userDAO;
+    private final MaterialDAO materialDAO;
+    private final SubjectDAO subjectDAO;
+    private final CloudinaryService cloudinaryService;
 
     private JTextField emailField = new JTextField(20);
     private JPasswordField passwordField = new JPasswordField(20);
     private JButton loginButton = new JButton("Login");
     private JButton registerButton = new JButton("Go to Register");
-    private JPanel formPanel; // <-- Made formPanel a field to disable it
+    private JPanel formPanel;
+
+    /**
+     * Helper class to store the result of the background login task.
+     * This allows us to return both the User and the fully-built JTabbedPane.
+     */
+    private static class LoginResult {
+        final User user;
+        final JTabbedPane tabbedPane;
+
+        LoginResult(User user, JTabbedPane tabbedPane) {
+            this.user = user;
+            this.tabbedPane = tabbedPane;
+        }
+    }
 
     public LoginPanel(MainFrame mainFrame, UserDAO userDAO) {
         this.mainFrame = mainFrame;
         this.userDAO = userDAO;
-
-        // Use a GridBagLayout to center the form panel
-        setLayout(new GridBagLayout());
-        setBackground(UITheme.APP_BACKGROUND); // Use theme background
-
-        // --- Create the main form panel ---
-        // Use the class field
-        formPanel = new JPanel(new GridBagLayout()); 
-        formPanel.setBackground(UITheme.CARD_BACKGROUND); // White card background
-        formPanel.setBorder(UITheme.createShadowBorder()); // Apply neo-brutalism shadow border
         
+        // We need all the DAOs to pre-build the panels in the background
+        this.materialDAO = new MaterialDAO();
+        this.subjectDAO = new SubjectDAO();
+        this.cloudinaryService = new CloudinaryService();
+
+
+        // --- UI Setup (No changes here) ---
+        setLayout(new GridBagLayout());
+        setBackground(UITheme.APP_BACKGROUND); 
+        formPanel = new JPanel(new GridBagLayout()); 
+        formPanel.setBackground(UITheme.CARD_BACKGROUND); 
+        formPanel.setBorder(UITheme.createShadowBorder()); 
         GridBagConstraints gbc = new GridBagConstraints();
-// ... (rest of the constructor code is identical) ...
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        // Title
         JLabel titleLabel = new JLabel("Note0 Login");
-        titleLabel.setFont(UITheme.HEADING_FONT); // Use theme heading font
+        titleLabel.setFont(UITheme.HEADING_FONT); 
         titleLabel.setForeground(UITheme.TEXT_COLOR);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        gbc.insets = new Insets(10, 10, 20, 10); // More padding below title
+        gbc.insets = new Insets(10, 10, 20, 10); 
         formPanel.add(titleLabel, gbc);
-
-        // --- Reset constraints for fields ---
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.insets = new Insets(10, 10, 10, 10);
-        
-        // Email
         JLabel emailLabel = new JLabel("Email:");
         emailLabel.setFont(UITheme.LABEL_FONT);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridx = 0; gbc.gridy = 1;
         formPanel.add(emailLabel, gbc);
-
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx = 1;
-        gbc.gridy = 1;
+        gbc.gridx = 1; gbc.gridy = 1;
         formPanel.add(emailField, gbc);
-
-        // Password
         JLabel passLabel = new JLabel("Password:");
         passLabel.setFont(UITheme.LABEL_FONT);
         gbc.anchor = GridBagConstraints.EAST;
-        gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridx = 0; gbc.gridy = 2;
         formPanel.add(passLabel, gbc);
-
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.gridx = 1;
-        gbc.gridy = 2;
+        gbc.gridx = 1; gbc.gridy = 2;
         formPanel.add(passwordField, gbc);
-
-        // Buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        buttonPanel.setBackground(UITheme.CARD_BACKGROUND); // Match card background
-        
-        UITheme.stylePrimaryButton(loginButton); // Style the login button
-        UITheme.styleSecondaryButton(registerButton); // Style the register button
-
+        buttonPanel.setBackground(UITheme.CARD_BACKGROUND); 
+        UITheme.stylePrimaryButton(loginButton); 
+        UITheme.styleSecondaryButton(registerButton); 
         buttonPanel.add(loginButton);
         buttonPanel.add(registerButton);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.NONE;
-        gbc.insets = new Insets(20, 10, 10, 10); // More padding above buttons
+        gbc.insets = new Insets(20, 10, 10, 10); 
         formPanel.add(buttonPanel, gbc);
-        
-        // --- Add the form panel to the main panel (which centers it) ---
         add(formPanel, new GridBagConstraints());
-// ... (rest of the constructor code is identical) ...
-
-        // Add Action Listeners
         loginButton.addActionListener(e -> handleLogin());
         registerButton.addActionListener(e -> mainFrame.showRegistrationPanel());
     }
@@ -117,17 +107,47 @@ public class LoginPanel extends JPanel {
         // Show the loading panel FIRST
         mainFrame.showLoadingPanel();
 
-        // Create a SwingWorker to run the database call on a background thread
-        SwingWorker<User, Void> worker = new SwingWorker<User, Void>() {
+        // Create a SwingWorker to run ALL database calls on a background thread
+        // It now returns a 'LoginResult' object
+        SwingWorker<LoginResult, Void> worker = new SwingWorker<LoginResult, Void>() {
             
             /**
              * This runs on a background thread.
              * No Swing UI code here!
              */
             @Override
-            protected User doInBackground() throws Exception {
-                // This is the long-running task
-                return userDAO.loginUser(email, password);
+            protected LoginResult doInBackground() throws Exception {
+                // 1. First task: Log the user in
+                User user = userDAO.loginUser(email, password);
+                
+                if (user != null) {
+                    // 2. Second task: If login is successful, pre-build all panels
+                    // This is where all the *other* database calls will happen,
+                    // safely in the background.
+                    JTabbedPane tabbedPane = new JTabbedPane();
+                    tabbedPane.setFont(UITheme.LABEL_FONT);
+                    tabbedPane.setBackground(UITheme.APP_BACKGROUND);
+
+                    FeedPanel feedPanel = new FeedPanel(mainFrame, user, materialDAO, subjectDAO, cloudinaryService);
+                    tabbedPane.addTab("Home", feedPanel);
+
+                    DashboardPanel dashboardPanel = new DashboardPanel(mainFrame, user, materialDAO, subjectDAO, cloudinaryService);
+                    tabbedPane.addTab("Browse", dashboardPanel);
+                    
+                    ProfilePanel profilePanel = new ProfilePanel(userDAO, user);
+                    tabbedPane.addTab("Profile", profilePanel);
+
+                    if ("ADMIN".equals(user.getRole())) {
+                        AdminPanel adminPanel = new AdminPanel(subjectDAO, materialDAO, cloudinaryService);
+                        tabbedPane.addTab("Admin", adminPanel);
+                    }
+                    
+                    // Return the fully-built result
+                    return new LoginResult(user, tabbedPane);
+                } else {
+                    // Login failed, return null
+                    return new LoginResult(null, null);
+                }
             }
 
             /**
@@ -137,11 +157,12 @@ public class LoginPanel extends JPanel {
             @Override
             protected void done() {
                 try {
-                    User user = get(); // Get the result from doInBackground()
+                    LoginResult result = get(); // Get the result from doInBackground()
                     
-                    if (user != null) {
-                        // Success! Show the main app feed
-                        mainFrame.showFeedPanel(user);
+                    if (result.user != null) {
+                        // Success! Show the main app feed.
+                        // This is now an INSTANT operation because the pane is already built.
+                        mainFrame.showFeedPanel(result.tabbedPane);
                     } else {
                         // Login failed, show error and go back to login panel
                         JOptionPane.showMessageDialog(mainFrame, "Invalid email or password.", "Login Failed", JOptionPane.ERROR_MESSAGE);

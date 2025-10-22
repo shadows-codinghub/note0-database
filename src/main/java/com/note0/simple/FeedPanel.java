@@ -12,11 +12,20 @@ public class FeedPanel extends JPanel {
     private final MainFrame mainFrame;
     private final User loggedInUser;
     private final MaterialDAO materialDAO;
+    private final SubjectDAO subjectDAO;
+    private final CloudinaryService cloudinaryService;
+
+    // We make the JTabbedPane a field so we can refresh it
+    private JTabbedPane tabbedPane;
 
     public FeedPanel(MainFrame mainFrame, User user, MaterialDAO materialDAO, SubjectDAO subjectDAO, CloudinaryService cloudinaryService) {
         this.mainFrame = mainFrame;
         this.loggedInUser = user;
         this.materialDAO = materialDAO;
+        // Keep these in case you need them later
+        this.subjectDAO = subjectDAO;
+        this.cloudinaryService = cloudinaryService;
+
 
         setLayout(new BorderLayout(10, 10)); // Add gaps
         setBackground(UITheme.APP_BACKGROUND);
@@ -32,11 +41,8 @@ public class FeedPanel extends JPanel {
         JButton logoutButton = new JButton("Logout");
         UITheme.styleSecondaryButton(logoutButton);
         
-        // --- FIX IS HERE ---
-        // Add the ActionListeners back to the buttons
         browseButton.addActionListener(e -> mainFrame.showDashboardPanel(loggedInUser));
         logoutButton.addActionListener(e -> mainFrame.showLoginPanel());
-        // -------------------
         
         JLabel welcomeLabel = new JLabel("Welcome, " + loggedInUser.getFullName());
         welcomeLabel.setFont(UITheme.LABEL_FONT);
@@ -47,14 +53,26 @@ public class FeedPanel extends JPanel {
         add(navPanel, BorderLayout.NORTH);
 
         // Main Content
-        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane(); // Initialize the class field
         tabbedPane.setFont(UITheme.LABEL_FONT);
 
+        // Build the feeds for the first time
+        buildFeeds();
+
+        add(tabbedPane, BorderLayout.CENTER);
+    }
+
+    /**
+     * A new method to build (or rebuild) all feed tabs.
+     */
+    private void buildFeeds() {
+        // Remove old content
+        tabbedPane.removeAll();
+        
+        // Add new, refreshed content
         tabbedPane.addTab("Recent", createFeedSection("Recent Materials"));
         tabbedPane.addTab("Recommended", createFeedSection("Recommended Materials"));
         tabbedPane.addTab("Popular", createFeedSection("Popular Materials"));
-
-        add(tabbedPane, BorderLayout.CENTER);
     }
 
     private JScrollPane createFeedSection(String title) {
@@ -175,8 +193,11 @@ public class FeedPanel extends JPanel {
                 materialDAO.addOrUpdateRating(materialId, loggedInUser.getId(), rating);
                 JOptionPane.showMessageDialog(this, "Rating saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 
-                // Refresh the feed to show updated ratings
-                mainFrame.showFeedPanel(loggedInUser);
+                // --- THIS IS THE FIX ---
+                // Instead of reloading the whole app, just rebuild this panel's feeds.
+                // This is very fast and won't trigger the loading circle.
+                buildFeeds();
+                // ---------------------
             }
             
         } catch (SQLException e) {
