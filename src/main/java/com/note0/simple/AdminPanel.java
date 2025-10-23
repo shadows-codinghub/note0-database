@@ -22,22 +22,36 @@ public class AdminPanel extends JPanel {
         this.materialDAO = materialDAO;
         this.cloudinaryService = cloudinaryService;
 
-        setLayout(new GridLayout(2, 1, 10, 10)); // Two main sections: Subjects and Materials
-        setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        setLayout(new GridLayout(2, 1, 15, 15)); // Two main sections: Subjects and Materials
+        setBackground(UITheme.APP_BACKGROUND);
+        setBorder(UITheme.APP_PADDING);
 
         // --- Subjects Panel ---
         JPanel subjectsPanel = new JPanel(new BorderLayout(10, 10));
-        subjectsPanel.setBorder(BorderFactory.createTitledBorder("Manage Subjects"));
+        subjectsPanel.setBackground(UITheme.CARD_BACKGROUND);
+        subjectsPanel.setBorder(UITheme.createShadowBorder());
+
+        // Title Label for Subjects
+        JLabel subjectTitle = new JLabel("Manage Subjects");
+        subjectTitle.setFont(UITheme.HEADING_FONT);
+        subjectTitle.setForeground(UITheme.TEXT_COLOR);
+        subjectTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        subjectTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        subjectsPanel.add(subjectTitle, BorderLayout.NORTH);
 
         subjectTableModel = new DefaultTableModel(new String[]{"ID", "Name", "Branch", "Semester"}, 0);
         subjectTable = new JTable(subjectTableModel);
         subjectsPanel.add(new JScrollPane(subjectTable), BorderLayout.CENTER);
         
         // Subject management buttons
-        JPanel subjectButtonPanel = new JPanel(new FlowLayout());
-        JButton addSubjectButton = new JButton("Add New Subject");
-        JButton deleteSubjectButton = new JButton("Delete Selected Subject");
+        JPanel subjectButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        subjectButtonPanel.setBackground(UITheme.CARD_BACKGROUND);
+        JButton addSubjectButton = new JButton("Add New");
+        UITheme.stylePrimaryButton(addSubjectButton);
+        JButton deleteSubjectButton = new JButton("Delete Selected");
+        UITheme.styleDangerButton(deleteSubjectButton);
         JButton refreshSubjectsButton = new JButton("Refresh");
+        UITheme.styleSecondaryButton(refreshSubjectsButton);
         
         subjectButtonPanel.add(addSubjectButton);
         subjectButtonPanel.add(deleteSubjectButton);
@@ -50,26 +64,39 @@ public class AdminPanel extends JPanel {
 
         // --- Materials Panel ---
         JPanel materialsPanel = new JPanel(new BorderLayout(10, 10));
-        materialsPanel.setBorder(BorderFactory.createTitledBorder("Manage Materials (Pending & All Uploaded Notes)"));
+        materialsPanel.setBackground(UITheme.CARD_BACKGROUND);
+        materialsPanel.setBorder(UITheme.createShadowBorder());
+
+        // Title Label for Materials
+        JLabel materialTitle = new JLabel("Manage Materials");
+        materialTitle.setFont(UITheme.HEADING_FONT);
+        materialTitle.setForeground(UITheme.TEXT_COLOR);
+        materialTitle.setHorizontalAlignment(SwingConstants.CENTER);
+        materialTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        materialsPanel.add(materialTitle, BorderLayout.NORTH);
 
         materialTableModel = new DefaultTableModel(new String[]{"ID", "Title", "Uploader", "Subject", "Status"}, 0);
         materialTable = new JTable(materialTableModel);
         materialsPanel.add(new JScrollPane(materialTable), BorderLayout.CENTER);
 
-        JPanel materialButtonPanel = new JPanel(new FlowLayout());
-        JButton approveButton = new JButton("Approve Selected");
-        JButton rejectButton = new JButton("Reject Selected");
-        JButton deleteMaterialButton = new JButton("Delete Selected");
+        JPanel materialButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        materialButtonPanel.setBackground(UITheme.CARD_BACKGROUND);
+        JButton approveButton = new JButton("Approve");
+        UITheme.stylePrimaryButton(approveButton);
+        JButton rejectButton = new JButton("Reject");
+        UITheme.styleDangerButton(rejectButton);
+        JButton deleteMaterialButton = new JButton("Delete");
+        UITheme.styleDangerButton(deleteMaterialButton);
         JButton showPendingButton = new JButton("Show Pending");
+        UITheme.styleSecondaryButton(showPendingButton);
         JButton showAllButton = new JButton("Show All");
-        JButton refreshButton = new JButton("Refresh");
+        UITheme.styleSecondaryButton(showAllButton);
         
+        materialButtonPanel.add(showPendingButton);
+        materialButtonPanel.add(showAllButton);
         materialButtonPanel.add(approveButton);
         materialButtonPanel.add(rejectButton);
         materialButtonPanel.add(deleteMaterialButton);
-        materialButtonPanel.add(showPendingButton);
-        materialButtonPanel.add(showAllButton);
-        materialButtonPanel.add(refreshButton);
         materialsPanel.add(materialButtonPanel, BorderLayout.SOUTH);
 
         approveButton.addActionListener(e -> approveMaterial());
@@ -77,7 +104,6 @@ public class AdminPanel extends JPanel {
         deleteMaterialButton.addActionListener(e -> deleteMaterial());
         showPendingButton.addActionListener(e -> loadPendingMaterials());
         showAllButton.addActionListener(e -> loadAllMaterials());
-        refreshButton.addActionListener(e -> loadPendingMaterials());
         
         // Add both main panels to the AdminPanel
         add(subjectsPanel);
@@ -88,6 +114,7 @@ public class AdminPanel extends JPanel {
     }
 
     private void loadSubjects() {
+// ... (existing code, no changes) ...
         subjectTableModel.setRowCount(0);
         try {
             List<Subject> subjects = subjectDAO.getAllSubjects();
@@ -100,6 +127,7 @@ public class AdminPanel extends JPanel {
     }
 
     private void loadPendingMaterials() {
+// ... (existing code, no changes) ...
         materialTableModel.setRowCount(0);
         try {
             List<Material> materials = materialDAO.getPendingMaterials();
@@ -112,6 +140,7 @@ public class AdminPanel extends JPanel {
     }
     
     private void loadAllMaterials() {
+// ... (existing code, no changes) ...
         materialTableModel.setRowCount(0);
         try {
             List<Material> materials = materialDAO.getAllMaterialsForAdmin();
@@ -129,29 +158,44 @@ public class AdminPanel extends JPanel {
         addSubjectDialog.setLayout(new BorderLayout());
         addSubjectDialog.setSize(400, 300);
         addSubjectDialog.setLocationRelativeTo(this);
+        addSubjectDialog.getContentPane().setBackground(UITheme.APP_BACKGROUND);
 
         // Form panel
         JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBackground(UITheme.CARD_BACKGROUND);
+        formPanel.setBorder(UITheme.APP_PADDING);
         GridBagConstraints gbc = new GridBagConstraints();
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        gbc.insets = new Insets(5, 5, 5, 5);
 
         // Subject name field
-        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST;
-        formPanel.add(new JLabel("Subject Name:"), gbc);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.EAST;
+        JLabel nameLabel = new JLabel("Subject Name:");
+        nameLabel.setForeground(UITheme.TEXT_COLOR);
+        nameLabel.setFont(UITheme.LABEL_FONT);
+        formPanel.add(nameLabel, gbc);
+        
         gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
         JTextField nameField = new JTextField(20);
         formPanel.add(nameField, gbc);
 
         // Branch field
         gbc.gridx = 0; gbc.gridy = 1; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
-        formPanel.add(new JLabel("Branch:"), gbc);
+        JLabel branchLabel = new JLabel("Branch:");
+        branchLabel.setForeground(UITheme.TEXT_COLOR);
+        branchLabel.setFont(UITheme.LABEL_FONT);
+        formPanel.add(branchLabel, gbc);
+        
         gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
         JTextField branchField = new JTextField(20);
         formPanel.add(branchField, gbc);
 
         // Semester field
         gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
-        formPanel.add(new JLabel("Semester:"), gbc);
+        JLabel semLabel = new JLabel("Semester:");
+        semLabel.setForeground(UITheme.TEXT_COLOR);
+        semLabel.setFont(UITheme.LABEL_FONT);
+        formPanel.add(semLabel, gbc);
+        
         gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
         JSpinner semesterSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 8, 1));
         formPanel.add(semesterSpinner, gbc);
@@ -159,15 +203,19 @@ public class AdminPanel extends JPanel {
         addSubjectDialog.add(formPanel, BorderLayout.CENTER);
 
         // Button panel
-        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(UITheme.CARD_BACKGROUND);
         JButton saveButton = new JButton("Save");
+        UITheme.stylePrimaryButton(saveButton);
         JButton cancelButton = new JButton("Cancel");
+        UITheme.styleSecondaryButton(cancelButton);
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
         addSubjectDialog.add(buttonPanel, BorderLayout.SOUTH);
 
         // Event handlers
         saveButton.addActionListener(e -> {
+// ... (existing code, no changes) ...
             String name = nameField.getText().trim();
             String branch = branchField.getText().trim();
             int semester = (Integer) semesterSpinner.getValue();
@@ -193,6 +241,7 @@ public class AdminPanel extends JPanel {
     }
 
     private void deleteSubject() {
+// ... (existing code, no changes) ...
         int selectedRow = subjectTable.getSelectedRow();
         if (selectedRow < 0) {
             JOptionPane.showMessageDialog(this, "Please select a subject to delete.", "Info", JOptionPane.INFORMATION_MESSAGE);
@@ -216,6 +265,7 @@ public class AdminPanel extends JPanel {
     }
 
     private void deleteMaterial() {
+// ... (existing code, no changes) ...
         int selectedRow = materialTable.getSelectedRow();
         if (selectedRow < 0) {
             JOptionPane.showMessageDialog(this, "Please select a material to delete.", "Info", JOptionPane.INFORMATION_MESSAGE);
@@ -244,6 +294,7 @@ public class AdminPanel extends JPanel {
     }
     
     private void approveMaterial() {
+// ... (existing code, no changes) ...
         int selectedRow = materialTable.getSelectedRow();
         if (selectedRow < 0) {
             JOptionPane.showMessageDialog(this, "Please select a material to approve.", "Info", JOptionPane.INFORMATION_MESSAGE);
@@ -264,6 +315,7 @@ public class AdminPanel extends JPanel {
     }
     
     private void rejectMaterial() {
+// ... (existing code, no changes) ...
         int selectedRow = materialTable.getSelectedRow();
         if (selectedRow < 0) {
             JOptionPane.showMessageDialog(this, "Please select a material to reject.", "Info", JOptionPane.INFORMATION_MESSAGE);

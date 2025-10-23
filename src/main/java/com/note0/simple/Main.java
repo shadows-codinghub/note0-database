@@ -1,11 +1,11 @@
 package com.note0.simple;
 
+import com.formdev.flatlaf.FlatDarkLaf; // <-- 1. IMPORT THE DARK THEME
 import javax.swing.SwingUtilities;
 import java.sql.SQLException;
 
 /**
  * The main entry point for the Note0 Desktop Application.
- * 
  * This class is responsible for initializing and launching the main application window.
  * It uses SwingUtilities.invokeLater to ensure that the GUI is created and updated
  * on the Event Dispatch Thread (EDT), which is the standard and required practice
@@ -14,6 +14,17 @@ import java.sql.SQLException;
 public class Main {
 
     public static void main(String[] args) {
+        
+        // --- 2. SET THE MODERN DARK LOOK AND FEEL ---
+        try {
+            // This is the only line that needs to change:
+            FlatDarkLaf.setup(); // This sets a clean, professional dark theme.
+            
+        } catch( Exception ex ) {
+            System.err.println( "Failed to initialize LaF" );
+        }
+        // ------------------------------------------
+
         // Schedule a job for the event dispatch thread:
         // creating and showing this application's GUI.
         SwingUtilities.invokeLater(new Runnable() {

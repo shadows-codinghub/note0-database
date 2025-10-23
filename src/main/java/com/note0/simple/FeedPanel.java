@@ -12,37 +12,73 @@ public class FeedPanel extends JPanel {
     private final MainFrame mainFrame;
     private final User loggedInUser;
     private final MaterialDAO materialDAO;
+    private final SubjectDAO subjectDAO;
+    private final CloudinaryService cloudinaryService;
+
+    // We make the JTabbedPane a field so we can refresh it
+    private JTabbedPane tabbedPane;
 
     public FeedPanel(MainFrame mainFrame, User user, MaterialDAO materialDAO, SubjectDAO subjectDAO, CloudinaryService cloudinaryService) {
         this.mainFrame = mainFrame;
         this.loggedInUser = user;
         this.materialDAO = materialDAO;
+        // Keep these in case you need them later
+        this.subjectDAO = subjectDAO;
+        this.cloudinaryService = cloudinaryService;
 
-        setLayout(new BorderLayout());
+
+        setLayout(new BorderLayout(10, 10)); // Add gaps
+        setBackground(UITheme.APP_BACKGROUND);
+        setBorder(UITheme.APP_PADDING); // Add padding around the whole panel
 
         // Navigation
         JPanel navPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        navPanel.setBackground(UITheme.APP_BACKGROUND); // Match background
+        
         JButton browseButton = new JButton("Browse All");
-        browseButton.addActionListener(e -> mainFrame.showDashboardPanel(loggedInUser));
+        UITheme.styleSecondaryButton(browseButton);
+        
         JButton logoutButton = new JButton("Logout");
+        UITheme.styleSecondaryButton(logoutButton);
+        
+        browseButton.addActionListener(e -> mainFrame.showDashboardPanel(loggedInUser));
         logoutButton.addActionListener(e -> mainFrame.showLoginPanel());
-        navPanel.add(new JLabel("Welcome, " + loggedInUser.getFullName()));
+        
+        JLabel welcomeLabel = new JLabel("Welcome, " + loggedInUser.getFullName());
+        welcomeLabel.setFont(UITheme.LABEL_FONT);
+
+        navPanel.add(welcomeLabel);
         navPanel.add(browseButton);
         navPanel.add(logoutButton);
         add(navPanel, BorderLayout.NORTH);
 
         // Main Content
-        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane(); // Initialize the class field
+        tabbedPane.setFont(UITheme.LABEL_FONT);
+
+        // Build the feeds for the first time
+        buildFeeds();
+
+        add(tabbedPane, BorderLayout.CENTER);
+    }
+
+    /**
+     * A new method to build (or rebuild) all feed tabs.
+     */
+    private void buildFeeds() {
+        // Remove old content
+        tabbedPane.removeAll();
+        
+        // Add new, refreshed content
         tabbedPane.addTab("Recent", createFeedSection("Recent Materials"));
         tabbedPane.addTab("Recommended", createFeedSection("Recommended Materials"));
         tabbedPane.addTab("Popular", createFeedSection("Popular Materials"));
-
-        add(tabbedPane, BorderLayout.CENTER);
     }
 
     private JScrollPane createFeedSection(String title) {
         JPanel sectionPanel = new JPanel();
         sectionPanel.setLayout(new BoxLayout(sectionPanel, BoxLayout.Y_AXIS));
+        sectionPanel.setBackground(UITheme.APP_BACKGROUND); // Match background
         
         List<Material> materials;
         try {
@@ -62,28 +98,38 @@ public class FeedPanel extends JPanel {
         } else {
             for (Material material : materials) {
                 sectionPanel.add(createSimpleMaterialPanel(material));
-                sectionPanel.add(Box.createRigidArea(new Dimension(0, 5))); // Spacer
+                sectionPanel.add(Box.createRigidArea(new Dimension(0, 15))); // More spacer
             }
         }
         
         JScrollPane scrollPane = new JScrollPane(sectionPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        scrollPane.setBackground(UITheme.APP_BACKGROUND);
         return scrollPane;
     }
 
     private JPanel createSimpleMaterialPanel(Material material) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createEtchedBorder());
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(UITheme.CARD_BACKGROUND);
+        panel.setBorder(UITheme.createShadowBorder()); // Apply shadow border to each card
 
         JPanel infoPanel = new JPanel();
+        infoPanel.setBackground(UITheme.CARD_BACKGROUND);
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-        infoPanel.add(new JLabel("Title: " + material.getTitle()));
-        infoPanel.add(new JLabel("Subject: " + material.getSubjectName())); // Simplified
+        
+        JLabel titleLabel = new JLabel(material.getTitle());
+        titleLabel.setFont(UITheme.LABEL_FONT);
+        infoPanel.add(titleLabel);
+        
+        infoPanel.add(new JLabel("Subject: " + material.getSubjectName())); 
         infoPanel.add(new JLabel("Rating: " + String.format("%.1f", material.getAverageRating())));
 
-        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(UITheme.CARD_BACKGROUND);
         JButton viewButton = new JButton("View");
+        UITheme.stylePrimaryButton(viewButton);
         JButton rateButton = new JButton("Rate");
+        UITheme.styleSecondaryButton(rateButton);
         
         viewButton.addActionListener(e -> handleMaterialClick(material));
         rateButton.addActionListener(e -> rateMaterial(material));
@@ -93,6 +139,13 @@ public class FeedPanel extends JPanel {
 
         panel.add(infoPanel, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.EAST);
+        
+        // Set fixed height for uniform cards
+        int cardHeight = 120;
+        panel.setMinimumSize(new Dimension(400, cardHeight));
+        panel.setPreferredSize(new Dimension(600, cardHeight));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, cardHeight));
+
         return panel;
     }
 
@@ -133,15 +186,18 @@ public class FeedPanel extends JPanel {
                            "\nCurrent rating: " + (currentRating > 0 ? currentRating + " stars" : "Not rated");
             
             int choice = JOptionPane.showOptionDialog(this, message, "Rate Material", 
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
             
             if (choice >= 0) {
                 int rating = choice + 1;
                 materialDAO.addOrUpdateRating(materialId, loggedInUser.getId(), rating);
                 JOptionPane.showMessageDialog(this, "Rating saved successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 
-                // Refresh the feed to show updated ratings
-                mainFrame.showFeedPanel(loggedInUser);
+                // --- THIS IS THE FIX ---
+                // Instead of reloading the whole app, just rebuild this panel's feeds.
+                // This is very fast and won't trigger the loading circle.
+                buildFeeds();
+                // ---------------------
             }
             
         } catch (SQLException e) {
@@ -149,3 +205,4 @@ public class FeedPanel extends JPanel {
         }
     }
 }
+

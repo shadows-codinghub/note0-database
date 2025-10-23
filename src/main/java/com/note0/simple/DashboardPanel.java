@@ -33,8 +33,10 @@ public class DashboardPanel extends JPanel {
         this.cloudinaryService = cloudinaryService;
 
         setLayout(new BorderLayout());
+        setBackground(UITheme.APP_BACKGROUND); // Set main background
 
         JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.setFont(UITheme.LABEL_FONT);
         tabbedPane.addTab("Browse Materials", createBrowsePanel());
         tabbedPane.addTab("Upload Material", createUploadPanel());
         tabbedPane.addTab("My Uploads", createMyUploadsPanel());
@@ -42,21 +44,29 @@ public class DashboardPanel extends JPanel {
         add(tabbedPane, BorderLayout.CENTER);
         
         JButton backButton = new JButton("Back to Feed");
+        UITheme.styleSecondaryButton(backButton);
         backButton.addActionListener(e -> mainFrame.showFeedPanel(loggedInUser));
-        add(backButton, BorderLayout.SOUTH);
+        
+        JPanel southPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        southPanel.setBackground(UITheme.APP_BACKGROUND);
+        southPanel.add(backButton);
+        add(southPanel, BorderLayout.SOUTH);
 
         loadAndCacheSubjects(); // Load subjects once
     }
 
     private JPanel createBrowsePanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.setBackground(UITheme.APP_BACKGROUND);
+        panel.setBorder(UITheme.APP_PADDING);
         
         // Filter Panel
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        filterPanel.setBackground(UITheme.APP_BACKGROUND);
         JTextField searchField = new JTextField(20);
         JComboBox<String> subjectFilterComboBox = new JComboBox<>();
         JButton filterButton = new JButton("Search / Refresh");
+        UITheme.stylePrimaryButton(filterButton);
 
         filterPanel.add(new JLabel("Search:"));
         filterPanel.add(searchField);
@@ -76,15 +86,10 @@ public class DashboardPanel extends JPanel {
         materialsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         materialsTable.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                if (evt.getClickCount() == 2) {
-                    int row = materialsTable.rowAtPoint(evt.getPoint());
-                    long materialId = (long) materialsTable.getModel().getValueAt(row, -1); // Hidden ID column
-                    try {
-                        Material material = materialDAO.getMaterialById(materialId);
-                        if(material != null) openMaterial(material);
-                    } catch(SQLException e) {
-                        JOptionPane.showMessageDialog(panel, "Error retrieving material details.", "Database Error", JOptionPane.ERROR_MESSAGE);
-                    }
+                if (evt.getClickCount() == 2 && materialsTable.getSelectedRow() != -1) {
+                    int modelRow = materialsTable.convertRowIndexToModel(materialsTable.getSelectedRow());
+                    Material material = currentMaterials.get(modelRow);
+                    openMaterial(material);
                 }
             }
         });
@@ -97,9 +102,12 @@ public class DashboardPanel extends JPanel {
         filterButton.addActionListener(e -> loadMaterials(searchField.getText(), (String) subjectFilterComboBox.getSelectedItem()));
 
         // Action buttons panel
-        JPanel actionPanel = new JPanel(new FlowLayout());
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        actionPanel.setBackground(UITheme.APP_BACKGROUND);
         JButton rateButton = new JButton("Rate Selected");
+        UITheme.stylePrimaryButton(rateButton);
         JButton viewButton = new JButton("View Selected");
+        UITheme.styleSecondaryButton(viewButton);
         
         rateButton.addActionListener(e -> rateSelectedMaterial());
         viewButton.addActionListener(e -> viewSelectedMaterial());
@@ -114,30 +122,70 @@ public class DashboardPanel extends JPanel {
     }
 
     private JPanel createUploadPanel() {
+        // This panel will be centered with a card look
+        JPanel wrapperPanel = new JPanel(new GridBagLayout());
+        wrapperPanel.setBackground(UITheme.APP_BACKGROUND);
+
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setBackground(UITheme.CARD_BACKGROUND);
+        panel.setBorder(UITheme.createShadowBorder());
+        
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Title
+        JLabel titleLabel = new JLabel("Upload New Material");
+        titleLabel.setFont(UITheme.HEADING_FONT);
+        titleLabel.setForeground(UITheme.TEXT_COLOR);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(titleLabel, gbc);
+        
+        gbc.gridwidth = 1; gbc.anchor = GridBagConstraints.EAST;
+        gbc.insets = new Insets(10, 10, 10, 10);
 
         JTextField titleField = new JTextField(20);
         JComboBox<String> uploadSubjectComboBox = new JComboBox<>();
         JButton chooseFileButton = new JButton("Choose File");
+        UITheme.styleSecondaryButton(chooseFileButton);
         JLabel selectedFileLabel = new JLabel("No file selected.");
+        selectedFileLabel.setForeground(UITheme.TEXT_COLOR);
         final File[] selectedFile = {null}; // Using an array to be final and mutable
         JButton uploadButton = new JButton("Upload");
+        UITheme.stylePrimaryButton(uploadButton);
 
         populateSubjectFilter(uploadSubjectComboBox);
         uploadSubjectComboBox.removeItem("All Subjects"); // Can't upload to 'All'
 
         // Layout
-        gbc.gridx = 0; gbc.gridy = 0; panel.add(new JLabel("Title:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 0; panel.add(titleField, gbc);
-        gbc.gridx = 0; gbc.gridy = 1; panel.add(new JLabel("Subject:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 1; panel.add(uploadSubjectComboBox, gbc);
-        gbc.gridx = 0; gbc.gridy = 2; panel.add(chooseFileButton, gbc);
-        gbc.gridx = 1; gbc.gridy = 2; panel.add(selectedFileLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = 3; gbc.anchor = GridBagConstraints.EAST; panel.add(uploadButton, gbc);
+        gbc.gridx = 0; gbc.gridy = 1; 
+        JLabel titleFieldLabel = new JLabel("Title:");
+        titleFieldLabel.setFont(UITheme.LABEL_FONT);
+        titleFieldLabel.setForeground(UITheme.TEXT_COLOR);
+        panel.add(titleFieldLabel, gbc);
+        
+        gbc.gridx = 1; gbc.gridy = 1; gbc.anchor = GridBagConstraints.WEST;
+        panel.add(titleField, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 2; gbc.anchor = GridBagConstraints.EAST;
+        JLabel subjectLabel = new JLabel("Subject:");
+        subjectLabel.setFont(UITheme.LABEL_FONT);
+        subjectLabel.setForeground(UITheme.TEXT_COLOR);
+        panel.add(subjectLabel, gbc);
+        
+        gbc.gridx = 1; gbc.gridy = 2; gbc.anchor = GridBagConstraints.WEST;
+        panel.add(uploadSubjectComboBox, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 3; gbc.anchor = GridBagConstraints.EAST;
+        panel.add(chooseFileButton, gbc);
+        
+        gbc.gridx = 1; gbc.gridy = 3; gbc.anchor = GridBagConstraints.WEST;
+        panel.add(selectedFileLabel, gbc);
+        
+        gbc.gridx = 1; gbc.gridy = 4; gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        panel.add(uploadButton, gbc);
 
         // Actions
         chooseFileButton.addActionListener(e -> {
@@ -156,10 +204,12 @@ public class DashboardPanel extends JPanel {
             handleUpload(titleField.getText(), (String) uploadSubjectComboBox.getSelectedItem(), selectedFile[0]);
         });
 
-        return panel;
+        wrapperPanel.add(panel, new GridBagConstraints()); // Add card to wrapper
+        return wrapperPanel; // Return wrapper
     }
 
     private void loadAndCacheSubjects() {
+// ... (existing code, no changes) ...
         try {
             allSubjects = subjectDAO.getAllSubjects();
             subjectNameToIdMap.clear();
@@ -171,12 +221,14 @@ public class DashboardPanel extends JPanel {
     }
     
     private void populateSubjectFilter(JComboBox<String> comboBox) {
+// ... (existing code, no changes) ...
         comboBox.removeAllItems();
         comboBox.addItem("All Subjects");
         allSubjects.stream().map(Subject::getName).distinct().sorted().forEach(comboBox::addItem);
     }
 
     private void loadMaterials(String titleFilter, String subjectFilter) {
+// ... (existing code, no changes) ...
         tableModel.setRowCount(0); // Clear existing data
         currentMaterials.clear(); // Clear current materials list
         try {
@@ -191,6 +243,7 @@ public class DashboardPanel extends JPanel {
     }
     
     private void openMaterial(Material material) {
+// ... (existing code, no changes) ...
         try {
             if (Desktop.isDesktopSupported() && material.getFilePath() != null) {
                  Desktop.getDesktop().browse(new java.net.URI(material.getFilePath()));
@@ -203,6 +256,7 @@ public class DashboardPanel extends JPanel {
     }
 
     private void handleUpload(String title, String subjectName, File file) {
+// ... (existing code, no changes) ...
         try {
             // 1. Upload the file to Cloudinary
             String url = cloudinaryService.uploadFile(file, "note0/materials", null);
@@ -219,7 +273,7 @@ public class DashboardPanel extends JPanel {
             // 3. Add the material metadata to the database
             materialDAO.addMaterial(title, url, subjectId, loggedInUser.getId());
             
-            JOptionPane.showMessageDialog(this, "Upload successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Upload successful! Your material is pending approval.", "Success", JOptionPane.INFORMATION_MESSAGE);
             
             // Refresh the materials list in the browse tab
             loadMaterials("", "All Subjects"); 
@@ -231,6 +285,7 @@ public class DashboardPanel extends JPanel {
     }
     
     private void rateSelectedMaterial() {
+// ... (existing code, no changes) ...
         int selectedRow = materialsTable.getSelectedRow();
         if (selectedRow < 0) {
             JOptionPane.showMessageDialog(this, "Please select a material to rate.", "Info", JOptionPane.INFORMATION_MESSAGE);
@@ -250,7 +305,7 @@ public class DashboardPanel extends JPanel {
                            "\nCurrent rating: " + (currentRating > 0 ? currentRating + " stars" : "Not rated");
             
             int choice = JOptionPane.showOptionDialog(this, message, "Rate Material", 
-                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
             
             if (choice >= 0) {
                 int rating = choice + 1;
@@ -267,6 +322,7 @@ public class DashboardPanel extends JPanel {
     }
     
     private void viewSelectedMaterial() {
+// ... (existing code, no changes) ...
         int selectedRow = materialsTable.getSelectedRow();
         if (selectedRow < 0) {
             JOptionPane.showMessageDialog(this, "Please select a material to view.", "Info", JOptionPane.INFORMATION_MESSAGE);
@@ -279,7 +335,8 @@ public class DashboardPanel extends JPanel {
     
     private JPanel createMyUploadsPanel() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.setBackground(UITheme.APP_BACKGROUND);
+        panel.setBorder(UITheme.APP_PADDING);
         
         // My uploads table
         String[] columnNames = {"Title", "Subject", "Rating", "Status"};
@@ -293,9 +350,12 @@ public class DashboardPanel extends JPanel {
         myUploadsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
         // Action buttons for my uploads
-        JPanel myUploadsActionPanel = new JPanel(new FlowLayout());
+        JPanel myUploadsActionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        myUploadsActionPanel.setBackground(UITheme.APP_BACKGROUND);
         JButton deleteMyUploadButton = new JButton("Delete Selected");
+        UITheme.styleDangerButton(deleteMyUploadButton);
         JButton refreshMyUploadsButton = new JButton("Refresh");
+        UITheme.styleSecondaryButton(refreshMyUploadsButton);
         
         deleteMyUploadButton.addActionListener(e -> deleteMyUpload(myUploadsTable, myUploadsModel));
         refreshMyUploadsButton.addActionListener(e -> loadMyUploads(myUploadsModel));
@@ -313,6 +373,7 @@ public class DashboardPanel extends JPanel {
     }
     
     private void loadMyUploads(DefaultTableModel model) {
+// ... (existing code, no changes) ...
         model.setRowCount(0);
         try {
             List<Material> myMaterials = materialDAO.getMaterialsByUser(loggedInUser.getId());
@@ -330,6 +391,7 @@ public class DashboardPanel extends JPanel {
     }
     
     private void deleteMyUpload(JTable table, DefaultTableModel model) {
+// ... (existing code, no changes) ...
         int selectedRow = table.getSelectedRow();
         if (selectedRow < 0) {
             JOptionPane.showMessageDialog(this, "Please select an upload to delete.", "Info", JOptionPane.INFORMATION_MESSAGE);
