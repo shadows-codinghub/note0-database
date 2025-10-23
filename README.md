@@ -88,20 +88,20 @@ Follow these steps to get the application running on your local machine.
 ### Configuration
 1.  Open the file `src/main/java/com/note0/simple/DatabaseManager.java`.
 2.  Replace the placeholder values for `DB_URL`, `USER`, and `PASSWORD` with your actual Aiven credentials.
-3.  Set the `CLOUDINARY_URL` environment variable before running the app. Format: `cloudinary://<api_key>:<api_secret>@<cloud_name>`
+3.  Set the `CLOUDINARY_URL` (CLOUDINARY_URL="cloudinary://634289314834876:cp8l9KJr4ZQHgVScRjwc3ux-XO8@dje3x3g7p") environment variable before running the app. Format: `cloudinary://<api_key>:<api_secret>@<cloud_name>`
     - Windows PowerShell example:
       ```bash
-      $env:CLOUDINARY_URL = "cloudinary://API_KEY:API_SECRET@CLOUD_NAME"
+      $env:CLOUDINARY_URL = "cloudinary://634289314834876:cp8l9KJr4ZQHgVScRjwc3ux-XO8@dje3x3g7p"
       mvn compile exec:java
       ```
     - Windows CMD example:
       ```bash
-      set CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+      set CLOUDINARY_URL=cloudinary://634289314834876:cp8l9KJr4ZQHgVScRjwc3ux-XO8@dje3x3g7p
       mvn compile exec:java
       ```
     - macOS/Linux example:
       ```bash
-      export CLOUDINARY_URL="cloudinary://API_KEY:API_SECRET@CLOUD_NAME"
+      export CLOUDINARY_URL="cloudinary://634289314834876:cp8l9KJr4ZQHgVScRjwc3ux-XO8@dje3x3g7p"
       mvn compile exec:java
       ```
 
