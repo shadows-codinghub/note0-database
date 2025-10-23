@@ -134,6 +134,39 @@
     
 % \end{titlepage}
 
+%======================================================================
+%   ii. SUMMARY OF CHANGES
+%======================================================================
+\chapter*{Summary of Changes}
+\addcontentsline{toc}{chapter}{Summary of Changes}
+
+This report has been updated to accurately reflect the actual implementation of the note0 application. The following corrections have been made to ensure consistency with the actual codebase:
+
+\section{Database Technology Corrections}
+All references to MySQL have been corrected to PostgreSQL throughout the document to match the actual implementation:
+
+\begin{itemize}
+    \item \textbf{Abstract Section:} Updated "cloud-hosted MySQL database" to "cloud-hosted PostgreSQL database"
+    \item \textbf{Project Objectives:} Updated "cloud-based database" to "cloud-based PostgreSQL database"
+    \item \textbf{Scope and Limitations:} Updated all generic database references to specifically mention PostgreSQL
+    \item \textbf{System Architecture:} Updated "MySQL relational database" to "PostgreSQL relational database hosted on Aiven"
+    \item \textbf{Database Hosting:} Updated to specify Aiven as the PostgreSQL hosting platform
+    \item \textbf{Conclusion:} Updated database references to PostgreSQL
+    \item \textbf{Future Scope:} Updated cloud database references to PostgreSQL
+    \item \textbf{Bibliography:} Updated MySQL documentation reference to PostgreSQL documentation
+\end{itemize}
+
+\section{Technical Accuracy Improvements}
+\begin{itemize}
+    \item Updated cloud platform references to specifically mention Aiven for database hosting
+    \item Corrected all generic "database" references to be more specific about PostgreSQL
+    \item Ensured consistency across all sections of the document
+    \item Updated technology stack descriptions to reflect actual implementation
+\end{itemize}
+
+These changes ensure that the report accurately documents the note0 application's actual implementation using PostgreSQL database hosted on Aiven cloud platform, maintaining technical accuracy and consistency throughout the document.
+
+\newpage
 
 %======================================================================
 %   iii. CERTIFICATION PAGE
@@ -276,7 +309,7 @@ We also declare that we have adhered to the ethics of academic honesty and integ
 
 Access to organized and sufficient study material is a cornerstone of effective education. However, students often face challenges due to the limited availability of physical textbooks and the fragmented nature of digital notes. This project, titled "note0," addresses this issue by developing a centralized and collaborative desktop application for note-sharing.
 
-The system is built using a 3-tier architecture. The client-side user interface is developed with the Java Swing framework, providing a responsive and intuitive desktop experience. The server-side business logic is handled by a robust Java backend. All data, including user credentials and note content, is securely stored in a cloud-hosted MySQL database, ensuring data persistence and accessibility. The project is managed using Apache Maven, which standardizes the build process and handles dependency management.
+The system is built using a 3-tier architecture. The client-side user interface is developed with the Java Swing framework, providing a responsive and intuitive desktop experience. The server-side business logic is handled by a robust Java backend. All data, including user credentials and note content, is securely stored in a cloud-hosted PostgreSQL database, ensuring data persistence and accessibility. The project is managed using Apache Maven, which standardizes the build process and handles dependency management.
 
 Key features of note0 include secure user authentication, comprehensive note management (Create, Read, Update, Delete), collaborative note-sharing capabilities, and a powerful search function. The platform successfully provides a solution to the initial problem by creating a unified hub where students can pool their collective knowledge, ensuring that essential study materials are accessible to everyone in the learning community. This report details the design, architecture, implementation, and testing of the note0 application.
 
@@ -318,7 +351,7 @@ The primary objective of this project is to design and develop a desktop applica
     \item To develop a secure system for user registration and login.
     \item To provide functionalities for creating, editing, viewing, and deleting notes.
     \item To implement a feature that allows users to securely share their notes with other registered users.
-    \item To ensure data is stored persistently and accessibly using a cloud-based database.
+    \item To ensure data is stored persistently and accessibly using a cloud-based PostgreSQL database.
     \item To build a user-friendly and intuitive graphical user interface (GUI).
 \end{itemize}
 
@@ -329,7 +362,7 @@ Limitations include:
 \begin{itemize}
     \item The current version is a desktop application and does not have a web or mobile client.
     \item Real-time collaborative editing (like Google Docs) is not supported in this version.
-    \item The application requires an active internet connection to synchronize with the cloud database.
+    \item The application requires an active internet connection to synchronize with the cloud PostgreSQL database.
 \end{itemize}
 %======================================================================
 %   DETAILED SCOPE AND LIMITATIONS SECTION
@@ -338,9 +371,9 @@ Limitations include:
 
 {Scope and Limitations}
 
-The scope of the note0 project is to deliver a robust and fully functional desktop application designed to serve as a centralized platform for academic note-sharing. The system's primary boundary encompasses the complete lifecycle of note management, which includes providing users with the ability to \textbf{Create, Read, Update, and Delete (CRUD)} notes through an intuitive Java Swing interface. A core feature within the project's scope is the implementation of a secure \textbf{user authentication} system, ensuring that all user data and notes are protected. Furthermore, the scope includes a \textbf{collaborative sharing} mechanism, allowing a registered user to grant access to their notes to other specific users on the platform. The technical scope involves a complete 3-tier architecture, with persistent data storage handled by a cloud-hosted \textbf{MySQL database} and project dependencies managed by \textbf{Maven}.
+The scope of the note0 project is to deliver a robust and fully functional desktop application designed to serve as a centralized platform for academic note-sharing. The system's primary boundary encompasses the complete lifecycle of note management, which includes providing users with the ability to \textbf{Create, Read, Update, and Delete (CRUD)} notes through an intuitive Java Swing interface. A core feature within the project's scope is the implementation of a secure \textbf{user authentication} system, ensuring that all user data and notes are protected. Furthermore, the scope includes a \textbf{collaborative sharing} mechanism, allowing a registered user to grant access to their notes to other specific users on the platform. The technical scope involves a complete 3-tier architecture, with persistent data storage handled by a cloud-hosted \textbf{PostgreSQL database} and project dependencies managed by \textbf{Maven}.
 
-It is important to acknowledge the limitations of the current version of the application to understand its boundaries clearly. The most significant limitation is that note0 is exclusively a \textbf{desktop application}, meaning it lacks a web-based or mobile client. This restricts access to users who are on a machine with the required Java Runtime Environment and the application installed. While the platform supports note sharing, it does not facilitate \textbf{real-time collaborative editing}; multiple users cannot edit the same note simultaneously. Additionally, the application is designed to be online-first and requires a persistent \textbf{internet connection} to synchronize with the cloud database, as there is no offline functionality for creating or viewing notes. Finally, advanced features common in commercial products, such as folder-based organization, version history, or support for rich media attachments, are outside the scope of this project version and are identified as potential areas for future development.
+It is important to acknowledge the limitations of the current version of the application to understand its boundaries clearly. The most significant limitation is that note0 is exclusively a \textbf{desktop application}, meaning it lacks a web-based or mobile client. This restricts access to users who are on a machine with the required Java Runtime Environment and the application installed. While the platform supports note sharing, it does not facilitate \textbf{real-time collaborative editing}; multiple users cannot edit the same note simultaneously. Additionally, the application is designed to be online-first and requires a persistent \textbf{internet connection} to synchronize with the cloud PostgreSQL database, as there is no offline functionality for creating or viewing notes. Finally, advanced features common in commercial products, such as folder-based organization, version history, or support for rich media attachments, are outside the scope of this project version and are identified as potential areas for future development.
 
 
 %----------------------------------------------------------------------
@@ -353,7 +386,7 @@ The note0 application is designed using a 3-tier architecture, which separates t
 \begin{enumerate}
     \item \textbf{Presentation Tier (Client):} This is the user interface that the user interacts with. It is developed using the Java Swing framework to create a responsive desktop application. Its primary role is to display data to the user and accept user input.
     \item \textbf{Logic Tier (Backend Server):} This tier contains the core business logic of the application. It is a Java-based server that processes requests from the client, interacts with the database, and enforces application rules. Services like authentication, note management, and sharing logic reside here.
-    \item \textbf{Data Tier (Database):} This tier is responsible for data storage and retrieval. We have used a MySQL relational database hosted on a cloud platform (e.g., AWS, Google Cloud). This ensures that the data is persistent, secure, and accessible over the internet.
+    \item \textbf{Data Tier (Database):} This tier is responsible for data storage and retrieval. We have used a PostgreSQL relational database hosted on a cloud platform (Aiven). This ensures that the data is persistent, secure, and accessible over the internet.
 \end{enumerate}
 
 \begin{figure}[h!]
@@ -382,7 +415,7 @@ For the data persistence layer, we selected \textbf{PostgreSQL}, a powerful, ope
 To ensure scalability, reliability, and efficient data management, the note0 application leverages a strategic cloud-based infrastructure. Instead of relying on a single service, our architecture separates the hosting of the database from the management of digital content, using specialized platforms for each task. This approach ensures optimal performance and security for different types of data.
 
 \subsection{Database Hosting}
-The core MySQL database is hosted on a dedicated Database-as-a-Service (DBaaS) platform, such as Amazon RDS or Google Cloud SQL. Storing the database in the cloud rather than on a traditional server offers several significant advantages:
+The core PostgreSQL database is hosted on a dedicated Database-as-a-Service (DBaaS) platform, specifically Aiven. Storing the database in the cloud rather than on a traditional server offers several significant advantages:
 \begin{itemize}
     \item \textbf{High Availability and Reliability:} Cloud database services provide built-in redundancy and failover mechanisms, ensuring the database is almost always online and accessible.
     \item \textbf{Automated Backups:} The platform automatically handles regular backups of the database, which is critical for disaster recovery and preventing data loss.
@@ -550,7 +583,7 @@ UAT was performed manually to ensure the application meets the end-user's requir
 \section{Conclusion}
 We successfully achieved our primary goal of developing **note0**, a collaborative note-sharing platform that directly addresses the challenges of resource scarcity and fragmented information.
 
-The project successfully integrated Java, Swing, and a cloud-hosted MySQL database to create a robust and scalable solution. Maven was instrumental in managing our project's dependencies and build cycle, ensuring a smooth and standardized development process.
+The project successfully integrated Java, Swing, and a cloud-hosted PostgreSQL database to create a robust and scalable solution. Maven was instrumental in managing our project's dependencies and build cycle, ensuring a smooth and standardized development process.
 
 In conclusion, **note0** is not just a functional application; it is a proof-of-concept for how technology can bridge gaps in educational resources and foster a more collaborative learning environment.
 
@@ -586,7 +619,7 @@ Improving the user's ability to manage and find their content is crucial for lon
 \end{itemize}
 
 \subsection{Offline Functionality}
-To improve accessibility, offline support could be implemented. This would involve creating a local cache or database (e.g., using SQLite) on the user's machine. Users could then view, create, and edit their notes without an active internet connection. All changes would be synchronized with the central cloud database automatically once the user goes online.
+To improve accessibility, offline support could be implemented. This would involve creating a local cache or database (e.g., using SQLite) on the user's machine. Users could then view, create, and edit their notes without an active internet connection. All changes would be synchronized with the central cloud PostgreSQL database automatically once the user goes online.
 %======================================================================
 %   ix. APPENDICES
 %======================================================================
@@ -745,8 +778,8 @@ Kathy Sierra and Bert Bates, "Head First Java", 2nd Edition, O'Reilly Media, 200
 \bibitem{maven_guide}
 Apache Maven Project, "Maven: The Definitive Guide", Sonatype, 2008. [Online]. Available: https://maven.apache.org/guides/
 
-\bibitem{mysql_docs}
-MySQL Documentation Team, "MySQL 8.0 Reference Manual", Oracle Corporation, 2024.
+\bibitem{postgresql_docs}
+PostgreSQL Documentation Team, "PostgreSQL 15 Documentation", PostgreSQL Global Development Group, 2024.
 
 \end{thebibliography}
 
